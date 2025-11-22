@@ -22,7 +22,7 @@ class Config:
     TESTING = False
 
     # MongoDB settings
-    MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb+srv://sachinchaurasiya69:606280Sk@tesing.8vhz1.mongodb.net/')
+    MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb+srv://sachinchaurasiya69:606280Sk@tesing.8vhz1.mongodb.net/odoo')
     MONGODB_DB_NAME = os.getenv('MONGODB_DB_NAME', 'inventory_management')
 
     # JWT settings

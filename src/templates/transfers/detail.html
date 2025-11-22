@@ -1,0 +1,230 @@
+{% extends "base.html" %} {% block title %}Transfer {{ transfer.transfer_number
+}} - Inventory Management{% endblock %} {% block breadcrumb %}
+<span class="breadcrumb-item">Operations</span>
+<i class="bi bi-chevron-right"></i>
+<a href="{{ url_for('transfers.list_transfers') }}" class="breadcrumb-item"
+  >Transfers</a
+>
+<i class="bi bi-chevron-right"></i>
+<span class="breadcrumb-item">{{ transfer.transfer_number }}</span>
+{% endblock %} {% block content %}
+<div class="page-header">
+  <div class="page-header-content">
+    <h1 class="page-title">
+      <i class="bi bi-arrow-left-right"></i>
+      Transfer {{ transfer.transfer_number }}
+    </h1>
+    <div class="d-flex gap-2">
+      <span
+        class="badge bg-{{ 'success' if transfer.status == 'completed' else 'primary' if transfer.status == 'draft' else 'warning' }} fs-6"
+      >
+        {{ transfer.status|upper }}
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <!-- Transfer Information -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Transfer Information</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="text-muted small">Transfer Number</label>
+            <p class="mb-0 fw-semibold">{{ transfer.transfer_number }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="text-muted small">Status</label>
+            <p class="mb-0">
+              <span
+                class="badge bg-{{ 'success' if transfer.status == 'completed' else 'primary' if transfer.status == 'draft' else 'warning' }}"
+              >
+                {{ transfer.status|upper }}
+              </span>
+            </p>
+          </div>
+          <div class="col-md-6">
+            <label class="text-muted small">From Warehouse</label>
+            <p class="mb-0">{{ transfer.from_warehouse_name or 'N/A' }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="text-muted small">To Warehouse</label>
+            <p class="mb-0">{{ transfer.to_warehouse_name or 'N/A' }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="text-muted small">Scheduled Date</label>
+            <p class="mb-0">
+              {{ transfer.scheduled_date[:10] if transfer.scheduled_date else
+              'Not set' }}
+            </p>
+          </div>
+          {% if transfer.completed_date %}
+          <div class="col-md-6">
+            <label class="text-muted small">Completed Date</label>
+            <p class="mb-0">{{ transfer.completed_date[:10] }}</p>
+          </div>
+          {% endif %} {% if transfer.notes %}
+          <div class="col-12">
+            <label class="text-muted small">Notes</label>
+            <p class="mb-0">{{ transfer.notes }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Items -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Items</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th class="text-end">Requested</th>
+                <th class="text-end">Transferred</th>
+                <th class="text-end">Received</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in transfer.items %}
+              <tr>
+                <td>
+                  <div>
+                    <div class="fw-semibold">
+                      {{ item.product_name or item.product_id }}
+                    </div>
+                    {% if item.product_sku %}
+                    <small class="text-muted">{{ item.product_sku }}</small>
+                    {% endif %}
+                  </div>
+                </td>
+                <td class="text-end">{{ item.requested_quantity }}</td>
+                <td class="text-end">{{ item.transferred_quantity or 0 }}</td>
+                <td class="text-end">{{ item.received_quantity or 0 }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status History -->
+    {% if transfer.status_history %}
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Status History</h5>
+      </div>
+      <div class="card-body">
+        <div class="timeline">
+          {% for history in transfer.status_history %}
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="d-flex justify-content-between">
+                <span class="badge bg-info">{{ history.status|upper }}</span>
+                <small class="text-muted"
+                  >{{ history.changed_at[:19] if history.changed_at else 'N/A'
+                  }}</small
+                >
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Actions Sidebar -->
+  <div class="col-lg-4">
+    <div class="card sticky-top" style="top: 20px">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Actions</h5>
+      </div>
+      <div class="card-body">
+        {% if transfer.status == 'draft' %}
+        <form
+          method="POST"
+          action="{{ url_for('transfers.transition_transfer_status', transfer_id=transfer._id) }}"
+        >
+          <input type="hidden" name="status" value="in_transit" />
+          <button type="submit" class="btn btn-primary w-100 mb-2">
+            <i class="bi bi-arrow-right-circle"></i> Start Transfer
+          </button>
+        </form>
+        {% elif transfer.status == 'in_transit' %}
+        <form
+          method="POST"
+          action="{{ url_for('transfers.transition_transfer_status', transfer_id=transfer._id) }}"
+          onsubmit="return confirm('This will move stock between warehouses. Continue?');"
+        >
+          <input type="hidden" name="status" value="completed" />
+          <button type="submit" class="btn btn-success w-100 mb-2">
+            <i class="bi bi-check-circle"></i> Complete Transfer
+          </button>
+        </form>
+        {% endif %} {% if transfer.status not in ['completed', 'cancelled'] %}
+        <form
+          method="POST"
+          action="{{ url_for('transfers.transition_transfer_status', transfer_id=transfer._id) }}"
+          onsubmit="return confirm('Cancel this transfer?');"
+        >
+          <input type="hidden" name="status" value="cancelled" />
+          <button type="submit" class="btn btn-outline-danger w-100 mb-2">
+            <i class="bi bi-x-circle"></i> Cancel
+          </button>
+        </form>
+        {% endif %}
+
+        <hr />
+        <a
+          href="{{ url_for('transfers.list_transfers') }}"
+          class="btn btn-outline-secondary w-100"
+        >
+          <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .timeline {
+    position: relative;
+    padding-left: 30px;
+  }
+  .timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+  }
+  .timeline-marker {
+    position: absolute;
+    left: -30px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #0d6efd;
+    border: 2px solid #fff;
+  }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: -25px;
+    top: 10px;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+  }
+</style>
+{% endblock %}

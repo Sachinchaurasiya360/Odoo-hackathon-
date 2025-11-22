@@ -1,0 +1,195 @@
+{% extends "base.html" %} {% block title %}Create Adjustment - Inventory
+Management{% endblock %} {% block breadcrumb %}
+<span class="breadcrumb-item">Operations</span>
+<i class="bi bi-chevron-right"></i>
+<a href="{{ url_for('adjustments.list_adjustments') }}" class="breadcrumb-item"
+  >Adjustments</a
+>
+<i class="bi bi-chevron-right"></i>
+<span class="breadcrumb-item">Create</span>
+{% endblock %} {% block content %}
+<div class="page-header">
+  <div class="page-header-content">
+    <h1 class="page-title">
+      <i class="bi bi-clipboard-check"></i>
+      Create Stock Adjustment
+    </h1>
+    <p class="page-description">
+      Record stock correction based on physical count
+    </p>
+  </div>
+</div>
+
+<form
+  method="POST"
+  action="{{ url_for('adjustments.create_adjustment') }}"
+  class="needs-validation"
+  novalidate
+>
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Adjustment Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="warehouse_id" class="form-label"
+                >Warehouse <span class="text-danger">*</span></label
+              >
+              <select
+                class="form-select"
+                id="warehouse_id"
+                name="warehouse_id"
+                required
+              >
+                <option value="">Select Warehouse</option>
+              </select>
+              <div class="invalid-feedback">Please select a warehouse</div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="product_id" class="form-label"
+                >Product <span class="text-danger">*</span></label
+              >
+              <select
+                class="form-select"
+                id="product_id"
+                name="product_id"
+                required
+              >
+                <option value="">Select Product</option>
+              </select>
+              <div class="invalid-feedback">Please select a product</div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="adjustment_type" class="form-label"
+                >Adjustment Type <span class="text-danger">*</span></label
+              >
+              <select
+                class="form-select"
+                id="adjustment_type"
+                name="adjustment_type"
+                required
+              >
+                <option value="physical_count">Physical Count</option>
+                <option value="damage">Damage</option>
+                <option value="loss">Loss</option>
+                <option value="found">Found</option>
+              </select>
+              <div class="invalid-feedback">
+                Please select an adjustment type
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="physical_quantity" class="form-label"
+                >Physical Quantity <span class="text-danger">*</span></label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="physical_quantity"
+                name="physical_quantity"
+                min="0"
+                step="0.01"
+                required
+              />
+              <small class="text-muted"
+                >Enter the actual counted quantity</small
+              >
+              <div class="invalid-feedback">Please enter physical quantity</div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="adjustment_date" class="form-label"
+                >Adjustment Date</label
+              >
+              <input
+                type="datetime-local"
+                class="form-control"
+                id="adjustment_date"
+                name="adjustment_date"
+              />
+            </div>
+
+            <div class="col-md-12">
+              <label for="reason" class="form-label">Reason</label>
+              <input
+                type="text"
+                class="form-control"
+                id="reason"
+                name="reason"
+                placeholder="Brief reason for adjustment"
+              />
+            </div>
+
+            <div class="col-md-12">
+              <label for="notes" class="form-label">Notes</label>
+              <textarea
+                class="form-control"
+                id="notes"
+                name="notes"
+                rows="3"
+                placeholder="Additional notes..."
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card sticky-top" style="top: 20px">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            <small>
+              <strong>Note:</strong> The system will calculate the difference
+              between the physical quantity and system quantity. Stock will be
+              adjusted when approved.
+            </small>
+          </div>
+          <hr />
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-circle"></i> Create Adjustment
+            </button>
+            <a
+              href="{{ url_for('adjustments.list_adjustments') }}"
+              class="btn btn-outline-secondary"
+            >
+              <i class="bi bi-x-circle"></i> Cancel
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+  (function () {
+    "use strict";
+    const forms = document.querySelectorAll(".needs-validation");
+    Array.from(forms).forEach((form) => {
+      form.addEventListener(
+        "submit",
+        (event) => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add("was-validated");
+        },
+        false
+      );
+    });
+  })();
+</script>
+{% endblock %}

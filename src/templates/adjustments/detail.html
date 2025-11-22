@@ -1,0 +1,192 @@
+{% extends "base.html" %} {% block title %}Adjustment {{
+adjustment.adjustment_number }} - Inventory Management{% endblock %} {% block
+breadcrumb %}
+<span class="breadcrumb-item">Operations</span>
+<i class="bi bi-chevron-right"></i>
+<a href="{{ url_for('adjustments.list_adjustments') }}" class="breadcrumb-item"
+  >Adjustments</a
+>
+<i class="bi bi-chevron-right"></i>
+<span class="breadcrumb-item">{{ adjustment.adjustment_number }}</span>
+{% endblock %} {% block content %}
+<div class="page-header">
+  <div class="page-header-content">
+    <h1 class="page-title">
+      <i class="bi bi-clipboard-check"></i>
+      Adjustment {{ adjustment.adjustment_number }}
+    </h1>
+    <div class="d-flex gap-2">
+      <span
+        class="badge bg-{{ 'success' if adjustment.status == 'approved' else 'primary' if adjustment.status == 'draft' else 'secondary' }} fs-6"
+      >
+        {{ adjustment.status|upper }}
+      </span>
+      {% if adjustment.difference > 0 %}
+      <span class="badge bg-success fs-6">+{{ adjustment.difference }}</span>
+      {% elif adjustment.difference < 0 %}
+      <span class="badge bg-danger fs-6">{{ adjustment.difference }}</span>
+      {% else %}
+      <span class="badge bg-secondary fs-6">0</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <!-- Adjustment Information -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Adjustment Information</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="text-muted small">Adjustment Number</label>
+            <p class="mb-0 fw-semibold">{{ adjustment.adjustment_number }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="text-muted small">Status</label>
+            <p class="mb-0">
+              <span
+                class="badge bg-{{ 'success' if adjustment.status == 'approved' else 'primary' if adjustment.status == 'draft' else 'secondary' }}"
+              >
+                {{ adjustment.status|upper }}
+              </span>
+            </p>
+          </div>
+          <div class="col-md-6">
+            <label class="text-muted small">Warehouse</label>
+            <p class="mb-0">{{ adjustment.warehouse_name or 'N/A' }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="text-muted small">Product</label>
+            <p class="mb-0">
+              {{ adjustment.product_name or 'N/A' }} {% if
+              adjustment.product_sku %}
+              <small class="text-muted">({{ adjustment.product_sku }})</small>
+              {% endif %}
+            </p>
+          </div>
+          <div class="col-md-6">
+            <label class="text-muted small">Adjustment Type</label>
+            <p class="mb-0 text-capitalize">
+              {{ adjustment.adjustment_type.replace('_', ' ') }}
+            </p>
+          </div>
+          <div class="col-md-6">
+            <label class="text-muted small">Adjustment Date</label>
+            <p class="mb-0">
+              {{ adjustment.adjustment_date[:10] if adjustment.adjustment_date
+              else 'N/A' }}
+            </p>
+          </div>
+          {% if adjustment.reason %}
+          <div class="col-12">
+            <label class="text-muted small">Reason</label>
+            <p class="mb-0">{{ adjustment.reason }}</p>
+          </div>
+          {% endif %} {% if adjustment.notes %}
+          <div class="col-12">
+            <label class="text-muted small">Notes</label>
+            <p class="mb-0">{{ adjustment.notes }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Quantity Details -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Quantity Details</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th class="text-end">Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>System Quantity</strong></td>
+                <td class="text-end">{{ adjustment.system_quantity }}</td>
+              </tr>
+              <tr>
+                <td><strong>Physical Quantity</strong></td>
+                <td class="text-end">{{ adjustment.physical_quantity }}</td>
+              </tr>
+              <tr
+                class="table-{{ 'success' if adjustment.difference > 0 else 'danger' if adjustment.difference < 0 else 'secondary' }}"
+              >
+                <td><strong>Difference</strong></td>
+                <td class="text-end fw-bold">
+                  {% if adjustment.difference > 0 %} +{{ adjustment.difference
+                  }} {% else %} {{ adjustment.difference }} {% endif %}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        {% if adjustment.difference != 0 %}
+        <div
+          class="alert alert-{{ 'success' if adjustment.difference > 0 else 'warning' }} mb-0"
+        >
+          <i
+            class="bi bi-{{ 'plus-circle' if adjustment.difference > 0 else 'dash-circle' }}"
+          ></i>
+          {% if adjustment.difference > 0 %}
+          <strong>Surplus:</strong> Stock will be <strong>increased</strong> by
+          {{ adjustment.difference }} units when approved. {% else %}
+          <strong>Shortage:</strong> Stock will be <strong>decreased</strong> by
+          {{ adjustment.difference|abs }} units when approved. {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions Sidebar -->
+  <div class="col-lg-4">
+    <div class="card sticky-top" style="top: 20px">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Actions</h5>
+      </div>
+      <div class="card-body">
+        {% if adjustment.status == 'draft' %}
+        <form
+          method="POST"
+          action="{{ url_for('adjustments.approve_adjustment', adjustment_id=adjustment._id) }}"
+          onsubmit="return confirm('This will adjust stock levels. Continue?');"
+        >
+          <button type="submit" class="btn btn-success w-100 mb-2">
+            <i class="bi bi-check-circle"></i> Approve & Apply
+          </button>
+        </form>
+
+        <form
+          method="POST"
+          action="{{ url_for('adjustments.cancel_adjustment', adjustment_id=adjustment._id) }}"
+          onsubmit="return confirm('Cancel this adjustment?');"
+        >
+          <button type="submit" class="btn btn-outline-danger w-100 mb-2">
+            <i class="bi bi-x-circle"></i> Cancel
+          </button>
+        </form>
+        {% endif %}
+
+        <hr />
+        <a
+          href="{{ url_for('adjustments.list_adjustments') }}"
+          class="btn btn-outline-secondary w-100"
+        >
+          <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
