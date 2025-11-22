@@ -1,0 +1,126 @@
+{% extends "base.html" %} {% block title %}Settings - Inventory Management{%
+endblock %} {% block breadcrumb %}
+<span class="breadcrumb-item">Settings</span>
+{% endblock %} {% block content %}
+<div class="page-header">
+  <div class="page-header-content">
+    <h1 class="page-title">
+      <i class="bi bi-gear"></i>
+      Settings
+    </h1>
+    <p class="page-description">System configuration and preferences</p>
+  </div>
+</div>
+
+<div class="row">
+  <!-- General Settings -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div class="mb-3">
+          <i class="bi bi-gear-fill text-primary" style="font-size: 3rem"></i>
+        </div>
+        <h5 class="card-title">General Settings</h5>
+        <p class="card-text text-muted">
+          Company information and system preferences
+        </p>
+        <a href="{{ url_for('settings.general') }}" class="btn btn-primary">
+          Configure <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Warehouse Management -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div class="mb-3">
+          <i class="bi bi-building text-success" style="font-size: 3rem"></i>
+        </div>
+        <h5 class="card-title">Warehouses</h5>
+        <p class="card-text text-muted">
+          Manage warehouse locations and settings
+        </p>
+        <a
+          href="{{ url_for('warehouses.list_warehouses') }}"
+          class="btn btn-success"
+        >
+          Manage <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Management -->
+  {% if session.get('user_role') == 'admin' %}
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div class="mb-3">
+          <i class="bi bi-people-fill text-info" style="font-size: 3rem"></i>
+        </div>
+        <h5 class="card-title">Users</h5>
+        <p class="card-text text-muted">Manage user accounts and permissions</p>
+        <a href="{{ url_for('settings.users') }}" class="btn btn-info">
+          Manage <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Product Categories -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div class="mb-3">
+          <i class="bi bi-tags-fill text-warning" style="font-size: 3rem"></i>
+        </div>
+        <h5 class="card-title">Product Categories</h5>
+        <p class="card-text text-muted">Organize products into categories</p>
+        <a href="#" class="btn btn-warning">
+          Manage <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backup & Restore -->
+  {% if session.get('user_role') == 'admin' %}
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div class="mb-3">
+          <i
+            class="bi bi-database-fill-gear text-danger"
+            style="font-size: 3rem"
+          ></i>
+        </div>
+        <h5 class="card-title">Backup & Restore</h5>
+        <p class="card-text text-muted">Data backup and restoration</p>
+        <a href="#" class="btn btn-danger">
+          Configure <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Notifications -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <div class="mb-3">
+          <i class="bi bi-bell-fill text-secondary" style="font-size: 3rem"></i>
+        </div>
+        <h5 class="card-title">Notifications</h5>
+        <p class="card-text text-muted">Configure notification preferences</p>
+        <a href="#" class="btn btn-secondary">
+          Configure <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

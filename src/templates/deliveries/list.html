@@ -2,15 +2,153 @@
 
 {% block title %}Deliveries - Inventory Management{% endblock %}
 
+{% block breadcrumb %}
+<span class="breadcrumb-item">Operations</span>
+<i class="bi bi-chevron-right"></i>
+<span class="breadcrumb-item">Deliveries</span>
+{% endblock %}
+
 {% block content %}
 <div class="page-header">
     <div class="page-header-content">
-        <h1 class="page-title">Deliveries</h1>
+        <h1 class="page-title">
+            <i class="bi bi-truck"></i>
+            Deliveries
+        </h1>
+        <a href="{{ url_for('deliveries.create_delivery') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create Delivery
+        </a>
     </div>
 </div>
+
+<!-- Status Summary -->
+<div class="row g-3 mb-4">
+    {% set status_labels = {'draft': 'Draft', 'pick': 'Picking', 'pack': 'Packing', 'validate': 'Validating', 'done': 'Done', 'cancelled': 'Cancelled'} %}
+    {% for status, label in status_labels.items() %}
+    <div class="col-md-2">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="mb-0">{{ status_counts.get(status, 0) }}</h3>
+                <p class="text-muted mb-0 small">{{ label }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Warehouse</label>
+                <select class="form-select" name="warehouse_id">
+                    <option value="">All Warehouses</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Status</label>
+                <select class="form-select" name="status">
+                    <option value="">All Status</option>
+                    <option value="draft" {% if current_status == 'draft' %}selected{% endif %}>Draft</option>
+                    <option value="pick" {% if current_status == 'pick' %}selected{% endif %}>Picking</option>
+                    <option value="pack" {% if current_status == 'pack' %}selected{% endif %}>Packing</option>
+                    <option value="validate" {% if current_status == 'validate' %}selected{% endif %}>Validating</option>
+                    <option value="done" {% if current_status == 'done' %}selected{% endif %}>Done</option>
+                    <option value="cancelled" {% if current_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+                <a href="{{ url_for('deliveries.list_deliveries') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x"></i> Clear
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Deliveries Table -->
 <div class="card">
     <div class="card-body">
-        <p class="text-muted">Deliveries module coming soon.</p>
+        {% if deliveries %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Delivery Number</th>
+                        <th>Customer</th>
+                        <th>Warehouse</th>
+                        <th>Scheduled Date</th>
+                        <th>Status</th>
+                        <th>Items</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for delivery in deliveries %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('deliveries.view_delivery', delivery_id=delivery._id) }}" class="fw-semibold text-decoration-none">
+                                {{ delivery.delivery_number }}
+                            </a>
+                        </td>
+                        <td>{{ delivery.customer_name }}</td>
+                        <td>{{ delivery.warehouse_name or 'N/A' }}</td>
+                        <td>{{ delivery.scheduled_date[:10] if delivery.scheduled_date else 'Not set' }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if delivery.status == 'done' else 'primary' if delivery.status == 'draft' else 'warning' }}">
+                                {{ delivery.status|upper }}
+                            </span>
+                        </td>
+                        <td>{{ delivery.items|length }}</td>
+                        <td class="text-end">
+                            <a href="{{ url_for('deliveries.view_delivery', delivery_id=delivery._id) }}" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if pagination.total_pages > 1 %}
+        <nav aria-label="Page navigation" class="mt-3">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {% if pagination.page == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('deliveries.list_deliveries', page=pagination.page-1, warehouse_id=current_warehouse, status=current_status) }}">
+                        Previous
+                    </a>
+                </li>
+                {% for p in range(1, pagination.total_pages + 1) %}
+                <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('deliveries.list_deliveries', page=p, warehouse_id=current_warehouse, status=current_status) }}">
+                        {{ p }}
+                    </a>
+                </li>
+                {% endfor %}
+                <li class="page-item {% if pagination.page == pagination.total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('deliveries.list_deliveries', page=pagination.page+1, warehouse_id=current_warehouse, status=current_status) }}">
+                        Next
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox display-1 text-muted"></i>
+            <p class="text-muted mt-3">No deliveries found</p>
+            <a href="{{ url_for('deliveries.create_delivery') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Create First Delivery
+            </a>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

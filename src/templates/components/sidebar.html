@@ -1,125 +1,166 @@
 <!-- Sidebar Navigation Component -->
 <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <div class="logo">
-            <i class="bi bi-boxes"></i>
-            <span class="logo-text">Inventory</span>
-        </div>
-        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
-            <i class="bi bi-list"></i>
-        </button>
+  <div class="sidebar-header">
+    <div class="logo">
+      <i class="bi bi-boxes"></i>
+      <span class="logo-text">Inventory</span>
     </div>
+    <button
+      class="sidebar-toggle"
+      id="sidebarToggle"
+      aria-label="Toggle sidebar"
+    >
+      <i class="bi bi-list"></i>
+    </button>
+  </div>
 
-    <nav class="sidebar-nav" role="navigation" aria-label="Main navigation">
-        <ul class="nav-list">
-            <!-- Dashboard -->
-            <li class="nav-item">
-                <a href="{{ url_for('dashboard.index') }}"
-                    class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
-                    <i class="bi bi-speedometer2"></i>
-                    <span class="nav-text">Dashboard</span>
-                </a>
-            </li>
+  <nav class="sidebar-nav" role="navigation" aria-label="Main navigation">
+    <ul class="nav-list">
+      <!-- Dashboard -->
+      <li class="nav-item">
+        <a
+          href="{{ url_for('dashboard.index') }}"
+          class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}"
+        >
+          <i class="bi bi-speedometer2"></i>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
 
-            <!-- Inventory Section -->
-            <li class="nav-section">
-                <span class="nav-section-title">Inventory</span>
-            </li>
+      <!-- Inventory Section -->
+      <li class="nav-section">
+        <span class="nav-section-title">Inventory</span>
+      </li>
 
-            <li class="nav-item">
-                <a href="{{ url_for('products.list_products') }}"
-                    class="nav-link {% if request.endpoint and 'products' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-box-seam"></i>
-                    <span class="nav-text">Products</span>
-                </a>
-            </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('products.list_products') }}"
+          class="nav-link {% if request.endpoint and 'products' in request.endpoint %}active{% endif %}"
+        >
+          <i class="bi bi-box-seam"></i>
+          <span class="nav-text">Products</span>
+        </a>
+      </li>
 
-            <li class="nav-item">
-                <a href="{{ url_for('warehouses.list_warehouses') }}"
-                    class="nav-link {% if request.endpoint and 'warehouses' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-building"></i>
-                    <span class="nav-text">Warehouses</span>
-                </a>
-            </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('warehouses.list_warehouses') }}"
+          class="nav-link {% if request.endpoint and 'warehouses' in request.endpoint %}active{% endif %}"
+        >
+          <i class="bi bi-building"></i>
+          <span class="nav-text">Warehouses</span>
+        </a>
+      </li>
 
-            <li class="nav-item">
-                <a href="{{ url_for('stock.view_stock_levels') }}"
-                    class="nav-link {% if request.endpoint and 'stock' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-stack"></i>
-                    <span class="nav-text">Stock Levels</span>
-                </a>
-            </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('stock.view_stock_levels') }}"
+          class="nav-link {% if request.endpoint and 'stock' in request.endpoint %}active{% endif %}"
+        >
+          <i class="bi bi-stack"></i>
+          <span class="nav-text">Stock Levels</span>
+        </a>
+      </li>
 
-            <!-- Operations Section -->
-            <li class="nav-section">
-                <span class="nav-section-title">Operations</span>
-            </li>
+      <!-- Operations Section -->
+      <li class="nav-section">
+        <span class="nav-section-title">Operations</span>
+      </li>
 
-            <li class="nav-item">
-                <a href="{{ url_for('receipts.list_receipts') }}"
-                    class="nav-link {% if request.endpoint and 'receipts' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-arrow-down-circle"></i>
-                    <span class="nav-text">Receipts</span>
-                    {% if pending_receipts and pending_receipts > 0 %}
-                    <span class="badge badge-warning">{{ pending_receipts }}</span>
-                    {% endif %}
-                </a>
-            </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('receipts.list_receipts') }}"
+          class="nav-link {% if request.endpoint and 'receipts' in request.endpoint %}active{% endif %}"
+        >
+          <i class="bi bi-arrow-down-circle"></i>
+          <span class="nav-text">Receipts</span>
+          {% if pending_receipts and pending_receipts > 0 %}
+          <span class="badge badge-warning">{{ pending_receipts }}</span>
+          {% endif %}
+        </a>
+      </li>
 
-            <li class="nav-item">
-                <a href="{{ url_for('deliveries.list_deliveries') }}"
-                    class="nav-link {% if request.endpoint and 'deliveries' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-arrow-up-circle"></i>
-                    <span class="nav-text">Deliveries</span>
-                    {% if pending_deliveries and pending_deliveries > 0 %}
-                    <span class="badge badge-warning">{{ pending_deliveries }}</span>
-                    {% endif %}
-                </a>
-            </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('deliveries.list_deliveries') }}"
+          class="nav-link {% if request.endpoint and 'deliveries' in request.endpoint %}active{% endif %}"
+        >
+          <i class="bi bi-arrow-up-circle"></i>
+          <span class="nav-text">Deliveries</span>
+          {% if pending_deliveries and pending_deliveries > 0 %}
+          <span class="badge badge-warning">{{ pending_deliveries }}</span>
+          {% endif %}
+        </a>
+      </li>
 
-            <li class="nav-item">
-                <a href="{{ url_for('transfers.list_transfers') }}"
-                    class="nav-link {% if request.endpoint and 'transfers' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-arrow-left-right"></i>
-                    <span class="nav-text">Transfers</span>
-                    {% if pending_transfers and pending_transfers > 0 %}
-                    <span class="badge badge-warning">{{ pending_transfers }}</span>
-                    {% endif %}
-                </a>
-            </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('transfers.list_transfers') }}"
+          class="nav-link {% if request.endpoint and 'transfers' in request.endpoint %}active{% endif %}"
+        >
+          <i class="bi bi-arrow-left-right"></i>
+          <span class="nav-text">Transfers</span>
+          {% if pending_transfers and pending_transfers > 0 %}
+          <span class="badge badge-warning">{{ pending_transfers }}</span>
+          {% endif %}
+        </a>
+      </li>
 
-            <li class="nav-item">
-                <a href="{{ url_for('adjustments.list_adjustments') }}"
-                    class="nav-link {% if request.endpoint and 'adjustments' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-pencil-square"></i>
-                    <span class="nav-text">Adjustments</span>
-                </a>
-            </li>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('adjustments.list_adjustments') }}"
+          class="nav-link {% if request.endpoint and 'adjustments' in request.endpoint %}active{% endif %}"
+        >
+          <i class="bi bi-pencil-square"></i>
+          <span class="nav-text">Adjustments</span>
+        </a>
+      </li>
 
-            <!-- Reports Section -->
-            <li class="nav-section">
-                <span class="nav-section-title">Reports</span>
-            </li>
+      <!-- Reports Section -->
+      <li class="nav-section">
+        <span class="nav-section-title">Reports</span>
+      </li>
 
-            <li class="nav-item">
-                <a href="{{ url_for('stock.view_ledger') }}"
-                    class="nav-link {% if request.endpoint == 'stock.view_ledger' %}active{% endif %}">
-                    <i class="bi bi-clock-history"></i>
-                    <span class="nav-text">Stock Ledger</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+      <li class="nav-item">
+        <a
+          href="{{ url_for('stock.view_ledger') }}"
+          class="nav-link {% if request.endpoint == 'stock.view_ledger' %}active{% endif %}"
+        >
+          <i class="bi bi-clock-history"></i>
+          <span class="nav-text">Stock Ledger</span>
+        </a>
+      </li>
 
-    <div class="sidebar-footer">
-        <div class="user-info">
-            <div class="user-avatar">
-                <i class="bi bi-person-circle"></i>
-            </div>
-            <div class="user-details">
-                <div class="user-name">{{ session.get('full_name') or session.get('username') }}</div>
-                <div class="user-role">{{ session.get('user_role') }}</div>
-            </div>
-        </div>
+      <!-- Settings Section -->
+      <li class="nav-section">
+        <span class="nav-section-title">System</span>
+      </li>
+
+      <li class="nav-item">
+        <a
+          href="{{ url_for('settings.index') }}"
+          class="nav-link {% if request.endpoint and 'settings' in request.endpoint %}active{% endif %}"
+        >
+          <i class="bi bi-gear"></i>
+          <span class="nav-text">Settings</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar">
+        <i class="bi bi-person-circle"></i>
+      </div>
+      <div class="user-details">
+        <a href="{{ url_for('profile.view') }}" class="text-decoration-none">
+          <div class="user-name">
+            {{ session.get('full_name') or session.get('username') }}
+          </div>
+        </a>
+        <div class="user-role">{{ session.get('user_role') }}</div>
+      </div>
     </div>
+  </div>
 </aside>

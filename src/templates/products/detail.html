@@ -1,0 +1,322 @@
+{% extends "base.html" %} {% block title %}{{ product.name }} - Product
+Details{% endblock %} {% block breadcrumb %}
+<span class="breadcrumb-item"
+  ><a href="{{ url_for('products.list_products') }}">Products</a></span
+>
+<i class="bi bi-chevron-right"></i>
+<span class="breadcrumb-item">{{ product.name }}</span>
+{% endblock %} {% block content %}
+<div class="page-header">
+  <div class="page-header-content">
+    <h1 class="page-title">
+      <i class="bi bi-box-seam"></i>
+      {{ product.name }}
+    </h1>
+    <p class="page-description">Product Details and Stock Information</p>
+  </div>
+  <div class="page-actions">
+    <a
+      href="{{ url_for('products.update_product', product_id=product._id) }}"
+      class="btn btn-primary"
+    >
+      <i class="bi bi-pencil"></i>
+      Edit Product
+    </a>
+    <button
+      type="button"
+      class="btn btn-danger"
+      data-bs-toggle="modal"
+      data-bs-target="#deleteModal"
+    >
+      <i class="bi bi-trash"></i>
+      Delete
+    </button>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Product Information Card -->
+  <div class="col-lg-6">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="bi bi-info-circle"></i>
+          Product Information
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-sm-4 text-muted">SKU:</div>
+          <div class="col-sm-8">
+            <span class="badge bg-secondary fs-6">{{ product.sku }}</span>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-sm-4 text-muted">Name:</div>
+          <div class="col-sm-8 fw-semibold">{{ product.name }}</div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-sm-4 text-muted">Description:</div>
+          <div class="col-sm-8">{{ product.description or '-' }}</div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-sm-4 text-muted">Category:</div>
+          <div class="col-sm-8">{{ category.name if category else '-' }}</div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-sm-4 text-muted">Unit of Measure:</div>
+          <div class="col-sm-8">
+            <span class="badge bg-info">{{ product.unit }}</span>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-sm-4 text-muted">Reorder Level:</div>
+          <div class="col-sm-8">
+            <span class="badge bg-warning text-dark"
+              >{{ product.reorder_level }}</span
+            >
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-sm-4 text-muted">Status:</div>
+          <div class="col-sm-8">
+            {% if product.is_active %}
+            <span class="badge bg-success">Active</span>
+            {% else %}
+            <span class="badge bg-danger">Inactive</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-sm-4 text-muted">Created:</div>
+          <div class="col-sm-8">{{ product.created_at|datetime_format }}</div>
+        </div>
+        {% if product.updated_at %}
+        <div class="row mb-3">
+          <div class="col-sm-4 text-muted">Last Updated:</div>
+          <div class="col-sm-8">{{ product.updated_at|datetime_format }}</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock Summary Card -->
+  <div class="col-lg-6">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="bi bi-layers"></i>
+          Stock Summary
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row mb-4">
+          <div class="col-6">
+            <div class="text-center p-3 border rounded">
+              <div class="text-muted small">Total Stock</div>
+              <div class="display-6 fw-bold text-primary">
+                {{ total_stock|number_format }}
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="text-center p-3 border rounded">
+              <div class="text-muted small">Available</div>
+              <div class="display-6 fw-bold text-success">
+                {{ available_stock|number_format }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% if total_stock < product.reorder_level %}
+        <div class="alert alert-warning" role="alert">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <strong>Low Stock Alert!</strong> Current stock ({{ total_stock }}) is
+          below reorder level ({{ product.reorder_level }}).
+        </div>
+        {% endif %} {% if total_stock == 0 %}
+        <div class="alert alert-danger" role="alert">
+          <i class="bi bi-x-circle-fill"></i>
+          <strong>Out of Stock!</strong> This product is currently unavailable.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stock Availability per Location -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="card-title mb-0">
+      <i class="bi bi-building"></i>
+      Stock Availability per Location
+    </h5>
+  </div>
+  <div class="card-body">
+    {% if stock_by_warehouse %}
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Warehouse</th>
+            <th>On Hand</th>
+            <th>Reserved</th>
+            <th>Available</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for stock in stock_by_warehouse %}
+          <tr>
+            <td>
+              <i class="bi bi-building text-muted"></i>
+              <strong>{{ stock.warehouse_name }}</strong>
+            </td>
+            <td class="fw-bold">{{ stock.quantity|number_format }}</td>
+            <td class="text-warning">
+              {{ stock.reserved_quantity|number_format }}
+            </td>
+            <td class="text-success fw-bold">
+              {{ (stock.quantity - stock.reserved_quantity)|number_format }}
+            </td>
+            <td>
+              {% if stock.quantity == 0 %}
+              <span class="badge bg-danger">Out of Stock</span>
+              {% elif stock.quantity < product.reorder_level %}
+              <span class="badge bg-warning text-dark">Low Stock</span>
+              {% else %}
+              <span class="badge bg-success">In Stock</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-inbox display-1"></i>
+      <p class="mt-3">No stock records found for this product</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Recent Movements -->
+<div class="card">
+  <div class="card-header">
+    <h5 class="card-title mb-0">
+      <i class="bi bi-clock-history"></i>
+      Recent Stock Movements
+    </h5>
+  </div>
+  <div class="card-body">
+    {% if recent_movements %}
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Warehouse</th>
+            <th>Quantity Change</th>
+            <th>Balance After</th>
+            <th>Reference</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for movement in recent_movements %}
+          <tr>
+            <td>{{ movement.created_at|datetime_format }}</td>
+            <td>
+              <span
+                class="badge {% if movement.transaction_type == 'receipt' %}bg-success {% elif movement.transaction_type == 'delivery' %}bg-primary {% elif movement.transaction_type == 'transfer' %}bg-warning text-dark {% else %}bg-info{% endif %}"
+              >
+                <i
+                  class="bi {% if movement.transaction_type == 'receipt' %}bi-box-arrow-in-down {% elif movement.transaction_type == 'delivery' %}bi-box-arrow-up {% elif movement.transaction_type == 'transfer' %}bi-arrow-left-right {% else %}bi-gear{% endif %}"
+                ></i>
+                {{ movement.transaction_type|title }}
+              </span>
+            </td>
+            <td>{{ movement.warehouse_name }}</td>
+            <td
+              class="{% if movement.quantity_change > 0 %}text-success{% else %}text-danger{% endif %} fw-bold"
+            >
+              {{ '+' if movement.quantity_change > 0 else '' }}{{
+              movement.quantity_change }}
+            </td>
+            <td>{{ movement.quantity_after|number_format }}</td>
+            <td>
+              <small class="text-muted">{{ movement.reference or '-' }}</small>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="mt-3">
+      <a
+        href="{{ url_for('stock.view_ledger', product_id=product._id) }}"
+        class="btn btn-sm btn-outline-primary"
+      >
+        <i class="bi bi-clock-history"></i>
+        View Full History
+      </a>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-inbox display-1"></i>
+      <p class="mt-3">No stock movements recorded yet</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div
+  class="modal fade"
+  id="deleteModal"
+  tabindex="-1"
+  aria-labelledby="deleteModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to delete <strong>{{ product.name }}</strong>?
+        </p>
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-triangle"></i>
+          This action cannot be undone. All stock records and history for this
+          product will be affected.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <form
+          method="POST"
+          action="{{ url_for('products.delete_product', product_id=product._id) }}"
+          style="display: inline"
+        >
+          <button type="submit" class="btn btn-danger">Delete Product</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

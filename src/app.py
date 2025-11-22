@@ -69,6 +69,8 @@ def register_blueprints(app):
     from modules.transfers.routes import transfers_bp
     from modules.adjustments.routes import adjustments_bp
     from modules.stock.routes import stock_bp
+    from modules.settings.routes import settings_bp
+    from modules.profile.routes import profile_bp
 
     # Register blueprints
     app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -80,6 +82,8 @@ def register_blueprints(app):
     app.register_blueprint(transfers_bp, url_prefix='/transfers')
     app.register_blueprint(adjustments_bp, url_prefix='/adjustments')
     app.register_blueprint(stock_bp, url_prefix='/stock')
+    app.register_blueprint(settings_bp, url_prefix='/settings')
+    app.register_blueprint(profile_bp, url_prefix='/profile')
 
     # Root route
     @app.route('/')

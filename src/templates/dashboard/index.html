@@ -11,15 +11,89 @@
         </div>
     </div>
 
-    <!-- KPI Cards -->
+    <!-- Dynamic Filters -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-funnel"></i> Filters</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('dashboard.index') }}" class="row g-3">
+                <div class="col-md-3">
+                    <label for="doc_type" class="form-label">Document Type</label>
+                    <select class="form-select" id="doc_type" name="doc_type" onchange="this.form.submit()">
+                        <option value="all" {% if doc_type == 'all' %}selected{% endif %}>All Documents</option>
+                        <option value="receipts" {% if doc_type == 'receipts' %}selected{% endif %}>Receipts</option>
+                        <option value="deliveries" {% if doc_type == 'deliveries' %}selected{% endif %}>Deliveries</option>
+                        <option value="transfers" {% if doc_type == 'transfers' %}selected{% endif %}>Internal Transfers</option>
+                        <option value="adjustments" {% if doc_type == 'adjustments' %}selected{% endif %}>Adjustments</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status" onchange="this.form.submit()">
+                        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Statuses</option>
+                        <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft</option>
+                        <option value="waiting" {% if status_filter == 'waiting' %}selected{% endif %}>Waiting</option>
+                        <option value="ready" {% if status_filter == 'ready' %}selected{% endif %}>Ready</option>
+                        <option value="done" {% if status_filter == 'done' %}selected{% endif %}>Done</option>
+                        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        <option value="pick" {% if status_filter == 'pick' %}selected{% endif %}>Pick</option>
+                        <option value="pack" {% if status_filter == 'pack' %}selected{% endif %}>Pack</option>
+                        <option value="validate" {% if status_filter == 'validate' %}selected{% endif %}>Validate</option>
+                        <option value="shipped" {% if status_filter == 'shipped' %}selected{% endif %}>Shipped</option>
+                        <option value="in_transit" {% if status_filter == 'in_transit' %}selected{% endif %}>In Transit</option>
+                        <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="warehouse" class="form-label">Warehouse</label>
+                    <select class="form-select" id="warehouse" name="warehouse" onchange="this.form.submit()">
+                        <option value="all" {% if warehouse_filter == 'all' %}selected{% endif %}>All Warehouses</option>
+                        {% for warehouse in warehouses %}
+                        <option value="{{ warehouse._id }}" {% if warehouse_filter == warehouse._id|string %}selected{% endif %}>
+                            {{ warehouse.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="category" class="form-label">Product Category</label>
+                    <select class="form-select" id="category" name="category" onchange="this.form.submit()">
+                        <option value="all" {% if category_filter == 'all' %}selected{% endif %}>All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category._id }}" {% if category_filter == category._id|string %}selected{% endif %}>
+                            {{ category.name or 'Uncategorized' }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Apply Filters
+                    </button>
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Clear Filters
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- KPI Cards - Row 1 -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <div class="card border-primary">
+            <div class="card border-primary h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-muted mb-1">Total Products</h6>
                             <h2 class="mb-0">{{ total_products|default(0) }}</h2>
+                            <small class="text-muted">Active in system</small>
                         </div>
                         <div class="text-primary" style="font-size: 2.5rem;">
                             <i class="bi bi-box-seam"></i>
@@ -30,28 +104,13 @@
         </div>
 
         <div class="col-md-3">
-            <div class="card border-success">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted mb-1">Warehouses</h6>
-                            <h2 class="mb-0">{{ total_warehouses|default(0) }}</h2>
-                        </div>
-                        <div class="text-success" style="font-size: 2.5rem;">
-                            <i class="bi bi-building"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border-warning">
+            <div class="card border-warning h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-muted mb-1">Low Stock Items</h6>
-                            <h2 class="mb-0">{{ low_stock_items|default(0) }}</h2>
+                            <h2 class="mb-0 text-warning">{{ low_stock_items|default(0) }}</h2>
+                            <small class="text-muted">Below reorder level</small>
                         </div>
                         <div class="text-warning" style="font-size: 2.5rem;">
                             <i class="bi bi-exclamation-triangle"></i>
@@ -62,12 +121,30 @@
         </div>
 
         <div class="col-md-3">
-            <div class="card border-info">
+            <div class="card border-danger h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Out of Stock</h6>
+                            <h2 class="mb-0 text-danger">{{ out_of_stock_items|default(0) }}</h2>
+                            <small class="text-muted">Zero quantity</small>
+                        </div>
+                        <div class="text-danger" style="font-size: 2.5rem;">
+                            <i class="bi bi-x-octagon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-info h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-muted mb-1">Total Stock Units</h6>
-                            <h2 class="mb-0">{{ total_stock|number_format(0) }}</h2>
+                            <h2 class="mb-0">{{ total_stock|default(0)|int }}</h2>
+                            <small class="text-muted">Across all warehouses</small>
                         </div>
                         <div class="text-info" style="font-size: 2.5rem;">
                             <i class="bi bi-stack"></i>
@@ -80,13 +157,19 @@
 
     <!-- Pending Documents -->
     <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="card">
+        <div class="col-md-3">
+            <div class="card h-100">
                 <div class="card-header bg-primary text-white">
                     <i class="bi bi-arrow-down-circle"></i> Pending Receipts
                 </div>
                 <div class="card-body text-center">
-                    <h1 class="display-4">{{ pending_receipts|default(0) }}</h1>
+                    <h1 class="display-4">
+                        {% if status_filter != 'all' %}
+                            {{ filtered_receipts|default(0) }}
+                        {% else %}
+                            {{ pending_receipts|default(0) }}
+                        {% endif %}
+                    </h1>
                     <a href="{{ url_for('receipts.list_receipts') }}" class="btn btn-primary btn-sm">
                         View All <i class="bi bi-arrow-right"></i>
                     </a>
@@ -94,13 +177,19 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card">
+        <div class="col-md-3">
+            <div class="card h-100">
                 <div class="card-header bg-success text-white">
                     <i class="bi bi-arrow-up-circle"></i> Pending Deliveries
                 </div>
                 <div class="card-body text-center">
-                    <h1 class="display-4">{{ pending_deliveries|default(0) }}</h1>
+                    <h1 class="display-4">
+                        {% if status_filter != 'all' %}
+                            {{ filtered_deliveries|default(0) }}
+                        {% else %}
+                            {{ pending_deliveries|default(0) }}
+                        {% endif %}
+                    </h1>
                     <a href="{{ url_for('deliveries.list_deliveries') }}" class="btn btn-success btn-sm">
                         View All <i class="bi bi-arrow-right"></i>
                     </a>
@@ -108,14 +197,40 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card">
+        <div class="col-md-3">
+            <div class="card h-100">
                 <div class="card-header bg-warning text-dark">
                     <i class="bi bi-arrow-left-right"></i> Pending Transfers
                 </div>
                 <div class="card-body text-center">
-                    <h1 class="display-4">{{ pending_transfers|default(0) }}</h1>
+                    <h1 class="display-4">
+                        {% if status_filter != 'all' %}
+                            {{ filtered_transfers|default(0) }}
+                        {% else %}
+                            {{ pending_transfers|default(0) }}
+                        {% endif %}
+                    </h1>
                     <a href="{{ url_for('transfers.list_transfers') }}" class="btn btn-warning btn-sm">
+                        View All <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-clipboard-check"></i> Pending Adjustments
+                </div>
+                <div class="card-body text-center">
+                    <h1 class="display-4">
+                        {% if status_filter != 'all' %}
+                            {{ filtered_adjustments|default(0) }}
+                        {% else %}
+                            {{ pending_adjustments|default(0) }}
+                        {% endif %}
+                    </h1>
+                    <a href="{{ url_for('adjustments.list_adjustments') }}" class="btn btn-info btn-sm">
                         View All <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
@@ -127,8 +242,11 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Stock Movements</h5>
+                    {% if doc_type != 'all' or warehouse_filter != 'all' %}
+                    <span class="badge bg-primary">Filtered Results</span>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     {% if recent_movements %}
@@ -136,7 +254,7 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Date</th>
+                                    <th>Date & Time</th>
                                     <th>Type</th>
                                     <th>Reference</th>
                                     <th>Product</th>
@@ -148,29 +266,70 @@
                             <tbody>
                                 {% for movement in recent_movements %}
                                 <tr>
-                                    <td>{{ movement.transaction_date|datetime_format }}</td>
                                     <td>
-                                        <span class="badge bg-{{ movement.transaction_type|status_badge }}">
-                                            {{ movement.transaction_type }}
-                                        </span>
+                                        <small>{{ movement.transaction_date|datetime_format('%d %b %Y') }}</small><br>
+                                        <small class="text-muted">{{ movement.transaction_date|datetime_format('%H:%M') }}</small>
                                     </td>
-                                    <td>{{ movement.reference_number }}</td>
-                                    <td>{{ movement.product_id }}</td>
-                                    <td>{{ movement.warehouse_id }}</td>
+                                    <td>
+                                        {% if movement.transaction_type == 'receipt' %}
+                                            <span class="badge bg-primary">
+                                                <i class="bi bi-arrow-down-circle"></i> Receipt
+                                            </span>
+                                        {% elif movement.transaction_type == 'delivery' %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-arrow-up-circle"></i> Delivery
+                                            </span>
+                                        {% elif movement.transaction_type == 'transfer_in' %}
+                                            <span class="badge bg-info">
+                                                <i class="bi bi-arrow-right-circle"></i> Transfer In
+                                            </span>
+                                        {% elif movement.transaction_type == 'transfer_out' %}
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="bi bi-arrow-left-circle"></i> Transfer Out
+                                            </span>
+                                        {% elif movement.transaction_type == 'adjustment' %}
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-clipboard-check"></i> Adjustment
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-dark">{{ movement.transaction_type }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>{{ movement.reference_number }}</strong><br>
+                                        <small class="text-muted">{{ movement.reference_type }}</small>
+                                    </td>
+                                    <td>{{ movement.product_name }}</td>
+                                    <td>{{ movement.warehouse_name }}</td>
                                     <td class="text-end">
-                                        <span
-                                            class="{% if movement.quantity_change > 0 %}text-success{% else %}text-danger{% endif %}">
-                                            {{ movement.quantity_change|number_format }}
+                                        <span class="{% if movement.quantity_change > 0 %}text-success fw-bold{% else %}text-danger fw-bold{% endif %}">
+                                            {% if movement.quantity_change > 0 %}+{% endif %}{{ movement.quantity_change|int }}
                                         </span>
                                     </td>
-                                    <td class="text-end">{{ movement.quantity_after|number_format }}</td>
+                                    <td class="text-end">
+                                        <strong>{{ movement.quantity_after|int }}</strong>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('stock.view_ledger') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-journal-text"></i> View Full Ledger
+                        </a>
+                    </div>
                     {% else %}
-                    <p class="text-muted text-center">No recent movements</p>
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                        <p class="text-muted mt-3">
+                            {% if doc_type != 'all' or warehouse_filter != 'all' %}
+                                No movements found with current filters
+                            {% else %}
+                                No recent movements
+                            {% endif %}
+                        </p>
+                    </div>
                     {% endif %}
                 </div>
             </div>

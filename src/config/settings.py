@@ -22,7 +22,7 @@ class Config:
     TESTING = False
 
     # MongoDB settings
-    MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb://localhost:27017/')
+    MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb+srv://sachinchaurasiya69:606280Sk@tesing.8vhz1.mongodb.net/')
     MONGODB_DB_NAME = os.getenv('MONGODB_DB_NAME', 'inventory_management')
 
     # JWT settings
@@ -40,6 +40,19 @@ class Config:
 
     # Business logic settings
     ALLOW_NEGATIVE_STOCK = os.getenv('ALLOW_NEGATIVE_STOCK', 'false').lower() == 'true'
+
+    # Email settings
+    MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+    MAIL_PORT = int(os.getenv('MAIL_PORT', 587))
+    MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', 'true').lower() == 'true'
+    MAIL_USE_SSL = os.getenv('MAIL_USE_SSL', 'false').lower() == 'true'
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME', '')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', '')
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@inventory.com')
+
+    # OTP settings
+    OTP_EXPIRY_MINUTES = int(os.getenv('OTP_EXPIRY_MINUTES', 10))
+    OTP_LENGTH = 6
 
     # Session settings
     SESSION_COOKIE_SECURE = True

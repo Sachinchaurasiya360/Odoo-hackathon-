@@ -1,0 +1,81 @@
+{% extends "base.html" %} {% block title %}User Management - Inventory
+Management{% endblock %} {% block breadcrumb %}
+<span class="breadcrumb-item"
+  ><a href="{{ url_for('settings.index') }}">Settings</a></span
+>
+<i class="bi bi-chevron-right"></i>
+<span class="breadcrumb-item">Users</span>
+{% endblock %} {% block content %}
+<div class="page-header">
+  <div class="page-header-content">
+    <h1 class="page-title">
+      <i class="bi bi-people"></i>
+      User Management
+    </h1>
+    <p class="page-description">Manage system users and their permissions</p>
+  </div>
+  <div class="page-actions">
+    <button class="btn btn-primary" disabled>
+      <i class="bi bi-plus-lg"></i>
+      Add User
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h5 class="card-title mb-0">System Users</h5>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>
+              <i class="bi bi-person-circle text-muted"></i>
+              <strong>{{ user.username }}</strong>
+            </td>
+            <td>{{ user.full_name or '-' }}</td>
+            <td>{{ user.email or '-' }}</td>
+            <td>
+              <span
+                class="badge {% if user.user_role == 'admin' %}bg-danger {% elif user.user_role == 'manager' %}bg-warning text-dark {% else %}bg-secondary{% endif %}"
+              >
+                {{ user.user_role|title }}
+              </span>
+            </td>
+            <td>
+              {% if user.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-danger">Inactive</span>
+              {% endif %}
+            </td>
+            <td>
+              {{ user.created_at|datetime_format if user.created_at else '-' }}
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-secondary" disabled>
+                <i class="bi bi-pencil"></i>
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

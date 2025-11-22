@@ -1,0 +1,260 @@
+{% extends "base.html" %} {% block title %}Create Delivery - Inventory
+Management{% endblock %} {% block breadcrumb %}
+<span class="breadcrumb-item">Operations</span>
+<i class="bi bi-chevron-right"></i>
+<a href="{{ url_for('deliveries.list_deliveries') }}" class="breadcrumb-item"
+  >Deliveries</a
+>
+<i class="bi bi-chevron-right"></i>
+<span class="breadcrumb-item">Create</span>
+{% endblock %} {% block content %}
+<div class="page-header">
+  <div class="page-header-content">
+    <h1 class="page-title">
+      <i class="bi bi-plus-circle"></i>
+      Create Delivery
+    </h1>
+    <p class="page-description">Create outgoing delivery order to customer</p>
+  </div>
+</div>
+
+<form
+  method="POST"
+  action="{{ url_for('deliveries.create_delivery') }}"
+  class="needs-validation"
+  novalidate
+>
+  <div class="row g-4">
+    <!-- Main Form -->
+    <div class="col-lg-8">
+      <!-- Delivery Details -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Delivery Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="warehouse_id" class="form-label"
+                >Warehouse <span class="text-danger">*</span></label
+              >
+              <select
+                class="form-select"
+                id="warehouse_id"
+                name="warehouse_id"
+                required
+              >
+                <option value="">Select Warehouse</option>
+              </select>
+              <div class="invalid-feedback">Please select a warehouse</div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="customer_name" class="form-label"
+                >Customer Name <span class="text-danger">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="customer_name"
+                name="customer_name"
+                required
+              />
+              <div class="invalid-feedback">Please enter customer name</div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="scheduled_date" class="form-label"
+                >Scheduled Date</label
+              >
+              <input
+                type="datetime-local"
+                class="form-control"
+                id="scheduled_date"
+                name="scheduled_date"
+              />
+            </div>
+
+            <div class="col-md-12">
+              <label for="customer_address" class="form-label"
+                >Customer Address</label
+              >
+              <textarea
+                class="form-control"
+                id="customer_address"
+                name="customer_address"
+                rows="2"
+              ></textarea>
+            </div>
+
+            <div class="col-md-12">
+              <label for="notes" class="form-label">Notes</label>
+              <textarea
+                class="form-control"
+                id="notes"
+                name="notes"
+                rows="3"
+                placeholder="Additional notes..."
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Items -->
+      <div class="card">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5 class="card-title mb-0">Items</h5>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-primary"
+            onclick="addItem()"
+          >
+            <i class="bi bi-plus"></i> Add Item
+          </button>
+        </div>
+        <div class="card-body">
+          <div id="items-container">
+            <!-- Items will be added here -->
+          </div>
+          <input type="hidden" id="item_count" name="item_count" value="0" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Sidebar -->
+    <div class="col-lg-4">
+      <div class="card sticky-top" style="top: 20px">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Summary</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2">
+            <span>Total Items:</span>
+            <strong id="summary-items">0</strong>
+          </div>
+          <div class="d-flex justify-content-between mb-3">
+            <span>Total Quantity:</span>
+            <strong id="summary-quantity">0</strong>
+          </div>
+          <hr />
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-circle"></i> Create Delivery
+            </button>
+            <a
+              href="{{ url_for('deliveries.list_deliveries') }}"
+              class="btn btn-outline-secondary"
+            >
+              <i class="bi bi-x-circle"></i> Cancel
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+  let itemIndex = 0;
+
+  function addItem() {
+    const container = document.getElementById("items-container");
+    const item = document.createElement("div");
+    item.className = "border rounded p-3 mb-3 item-row";
+    item.id = `item-${itemIndex}`;
+    item.innerHTML = `
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label">Product <span class="text-danger">*</span></label>
+                    <select class="form-select product-select" name="items[${itemIndex}][product_id]" required>
+                        <option value="">Select Product</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Quantity <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control quantity-input" 
+                           name="items[${itemIndex}][ordered_quantity]" 
+                           min="0.01" step="0.01" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Unit Price</label>
+                    <input type="number" class="form-control" 
+                           name="items[${itemIndex}][unit_price]" 
+                           min="0" step="0.01">
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="button" class="btn btn-outline-danger w-100" onclick="removeItem(${itemIndex})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    container.appendChild(item);
+
+    // Add change listeners
+    item.querySelectorAll(".quantity-input").forEach((input) => {
+      input.addEventListener("change", updateSummary);
+    });
+
+    itemIndex++;
+    updateItemCount();
+    updateSummary();
+  }
+
+  function removeItem(index) {
+    const item = document.getElementById(`item-${index}`);
+    if (item) {
+      item.remove();
+      updateItemCount();
+      updateSummary();
+    }
+  }
+
+  function updateItemCount() {
+    const count = document.querySelectorAll(".item-row").length;
+    document.getElementById("item_count").value = itemIndex;
+  }
+
+  function updateSummary() {
+    const items = document.querySelectorAll(".item-row");
+    let totalQuantity = 0;
+
+    items.forEach((item) => {
+      const qty = parseFloat(item.querySelector(".quantity-input").value) || 0;
+      totalQuantity += qty;
+    });
+
+    document.getElementById("summary-items").textContent = items.length;
+    document.getElementById("summary-quantity").textContent =
+      totalQuantity.toFixed(2);
+  }
+
+  // Add first item on load
+  document.addEventListener("DOMContentLoaded", function () {
+    addItem();
+  });
+
+  // Form validation
+  (function () {
+    "use strict";
+    const forms = document.querySelectorAll(".needs-validation");
+    Array.from(forms).forEach((form) => {
+      form.addEventListener(
+        "submit",
+        (event) => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add("was-validated");
+        },
+        false
+      );
+    });
+  })();
+</script>
+{% endblock %}

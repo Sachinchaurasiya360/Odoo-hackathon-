@@ -219,3 +219,208 @@ def api_verify_token():
     except Exception as e:
         logger.error(f"Token verification error: {e}")
         return error_response("Invalid or expired token", status_code=401)
+
+
+# Password Reset Routes
+
+@auth_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    """
+    Forgot password route - Request OTP.
+
+    GET: Display forgot password form.
+    POST: Send OTP to email.
+    """
+    if request.method == 'GET':
+        return render_template('auth/forgot_password.html')
+
+    # Handle POST request
+    email = request.form.get('email', '').strip()
+
+    if not email:
+        flash('Email is required', 'danger')
+        return render_template('auth/forgot_password.html')
+
+    try:
+        result = auth_service.request_password_reset(email)
+        flash('If your email is registered, you will receive an OTP shortly.', 'success')
+        return redirect(url_for('auth.verify_otp', email=email))
+
+    except ValueError as e:
+        flash(str(e), 'danger')
+        return render_template('auth/forgot_password.html')
+    except Exception as e:
+        logger.error(f"Forgot password error: {e}")
+        flash('An error occurred. Please try again later.', 'danger')
+        return render_template('auth/forgot_password.html')
+
+
+@auth_bp.route('/verify-otp', methods=['GET', 'POST'])
+def verify_otp():
+    """
+    Verify OTP route.
+
+    GET: Display OTP verification form.
+    POST: Verify OTP and proceed to password reset.
+    """
+    email = request.args.get('email', '').strip()
+
+    if request.method == 'GET':
+        if not email:
+            flash('Email is required', 'warning')
+            return redirect(url_for('auth.forgot_password'))
+        return render_template('auth/verify_otp.html', email=email)
+
+    # Handle POST request
+    email = request.form.get('email', '').strip()
+    otp_code = request.form.get('otp', '').strip()
+
+    if not email or not otp_code:
+        flash('Email and OTP are required', 'danger')
+        return render_template('auth/verify_otp.html', email=email)
+
+    try:
+        result = auth_service.verify_otp(email, otp_code)
+        session['reset_token'] = result['reset_token']
+        flash('OTP verified! Please set your new password.', 'success')
+        return redirect(url_for('auth.reset_password'))
+
+    except ValueError as e:
+        flash(str(e), 'danger')
+        return render_template('auth/verify_otp.html', email=email)
+    except Exception as e:
+        logger.error(f"OTP verification error: {e}")
+        flash('An error occurred. Please try again.', 'danger')
+        return render_template('auth/verify_otp.html', email=email)
+
+
+@auth_bp.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    """
+    Reset password route.
+
+    GET: Display new password form.
+    POST: Reset password with new password.
+    """
+    reset_token = session.get('reset_token')
+
+    if not reset_token:
+        flash('Invalid reset session. Please start over.', 'warning')
+        return redirect(url_for('auth.forgot_password'))
+
+    if request.method == 'GET':
+        return render_template('auth/reset_password.html')
+
+    # Handle POST request
+    new_password = request.form.get('new_password', '')
+    confirm_password = request.form.get('confirm_password', '')
+
+    if not new_password or not confirm_password:
+        flash('Both password fields are required', 'danger')
+        return render_template('auth/reset_password.html')
+
+    if new_password != confirm_password:
+        flash('Passwords do not match', 'danger')
+        return render_template('auth/reset_password.html')
+
+    try:
+        result = auth_service.reset_password(reset_token, new_password)
+        session.pop('reset_token', None)  # Clear reset token from session
+        flash('Password reset successfully! Please log in with your new password.', 'success')
+        return redirect(url_for('auth.login'))
+
+    except ValueError as e:
+        flash(str(e), 'danger')
+        return render_template('auth/reset_password.html')
+    except Exception as e:
+        logger.error(f"Password reset error: {e}")
+        flash('An error occurred. Please try again.', 'danger')
+        return render_template('auth/reset_password.html')
+
+
+# API endpoints for password reset
+
+@auth_bp.route('/api/forgot-password', methods=['POST'])
+def api_forgot_password():
+    """
+    API endpoint to request password reset OTP.
+
+    Returns success message.
+    """
+    data = request.get_json()
+    
+    if not data:
+        return error_response("Invalid request data", status_code=400)
+
+    email = data.get('email', '').strip()
+
+    if not email:
+        return error_response("Email is required", status_code=400)
+
+    try:
+        result = auth_service.request_password_reset(email)
+        return success_response(result, result['message'])
+
+    except ValueError as e:
+        return error_response(str(e), status_code=400)
+    except Exception as e:
+        logger.error(f"API forgot password error: {e}")
+        return error_response("An error occurred", status_code=500)
+
+
+@auth_bp.route('/api/verify-otp', methods=['POST'])
+def api_verify_otp():
+    """
+    API endpoint to verify OTP.
+
+    Returns reset token.
+    """
+    data = request.get_json()
+    
+    if not data:
+        return error_response("Invalid request data", status_code=400)
+
+    email = data.get('email', '').strip()
+    otp_code = data.get('otp', '').strip()
+
+    if not email or not otp_code:
+        return error_response("Email and OTP are required", status_code=400)
+
+    try:
+        result = auth_service.verify_otp(email, otp_code)
+        return success_response(result, "OTP verified successfully")
+
+    except ValueError as e:
+        return error_response(str(e), status_code=400)
+    except Exception as e:
+        logger.error(f"API OTP verification error: {e}")
+        return error_response("An error occurred", status_code=500)
+
+
+@auth_bp.route('/api/reset-password', methods=['POST'])
+def api_reset_password():
+    """
+    API endpoint to reset password.
+
+    Returns success message.
+    """
+    data = request.get_json()
+    
+    if not data:
+        return error_response("Invalid request data", status_code=400)
+
+    reset_token = data.get('reset_token', '').strip()
+    new_password = data.get('new_password', '')
+
+    if not reset_token or not new_password:
+        return error_response("Reset token and new password are required", status_code=400)
+
+    try:
+        result = auth_service.reset_password(reset_token, new_password)
+        return success_response(result, "Password reset successfully")
+
+    except ValueError as e:
+        return error_response(str(e), status_code=400)
+    except Exception as e:
+        logger.error(f"API password reset error: {e}")
+        return error_response("An error occurred", status_code=500)

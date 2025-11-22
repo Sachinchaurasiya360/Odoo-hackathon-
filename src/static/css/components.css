@@ -464,3 +464,94 @@
         display: none;
     }
 }
+/* ===== DASHBOARD ENHANCEMENTS ===== */
+
+/* KPI Cards */
+.card.border-primary,
+.card.border-success,
+.card.border-warning,
+.card.border-danger,
+.card.border-info {
+    border-width: 2px;
+    transition: all 0.3s ease;
+}
+
+.card.border-primary:hover,
+.card.border-success:hover,
+.card.border-warning:hover,
+.card.border-danger:hover,
+.card.border-info:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Dashboard Filter Section */
+.card-header.bg-light {
+    background-color: #f8f9fa !important;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Pending Documents Cards */
+.card-header.bg-primary,
+.card-header.bg-success,
+.card-header.bg-warning,
+.card-header.bg-info {
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+}
+
+.display-4 {
+    font-weight: 700;
+    color: #1e293b;
+}
+
+/* Movement Table Enhancements */
+.table-hover tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Badge Enhancements */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.625rem;
+    font-weight: 500;
+}
+
+.badge i {
+    font-size: 0.875rem;
+    margin-right: 0.25rem;
+}
+
+/* Empty State */
+.text-center.py-5 i.bi-inbox {
+    opacity: 0.3;
+}
+
+/* Filter Active Indicator */
+.badge.bg-primary {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Responsive Dashboard */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    
+    .card-body h2 {
+        font-size: 1.5rem;
+    }
+}

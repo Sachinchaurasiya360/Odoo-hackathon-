@@ -1,0 +1,263 @@
+{% extends "base.html" %} {% block title %}Delivery {{ delivery.delivery_number
+}} - Inventory Management{% endblock %} {% block breadcrumb %}
+<span class="breadcrumb-item">Operations</span>
+<i class="bi bi-chevron-right"></i>
+<a href="{{ url_for('deliveries.list_deliveries') }}" class="breadcrumb-item"
+  >Deliveries</a
+>
+<i class="bi bi-chevron-right"></i>
+<span class="breadcrumb-item">{{ delivery.delivery_number }}</span>
+{% endblock %} {% block content %}
+<div class="page-header">
+  <div class="page-header-content">
+    <h1 class="page-title">
+      <i class="bi bi-truck"></i>
+      Delivery {{ delivery.delivery_number }}
+    </h1>
+    <div class="d-flex gap-2">
+      <span
+        class="badge bg-{{ 'success' if delivery.status == 'done' else 'primary' if delivery.status == 'draft' else 'warning' }} fs-6"
+      >
+        {{ delivery.status|upper }}
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Main Content -->
+  <div class="col-lg-8">
+    <!-- Delivery Information -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Delivery Information</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="text-muted small">Delivery Number</label>
+            <p class="mb-0 fw-semibold">{{ delivery.delivery_number }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="text-muted small">Status</label>
+            <p class="mb-0">
+              <span
+                class="badge bg-{{ 'success' if delivery.status == 'done' else 'primary' if delivery.status == 'draft' else 'warning' }}"
+              >
+                {{ delivery.status|upper }}
+              </span>
+            </p>
+          </div>
+          <div class="col-md-6">
+            <label class="text-muted small">Customer</label>
+            <p class="mb-0">{{ delivery.customer_name }}</p>
+          </div>
+          <div class="col-md-6">
+            <label class="text-muted small">Warehouse</label>
+            <p class="mb-0">{{ delivery.warehouse_name or 'N/A' }}</p>
+          </div>
+          {% if delivery.customer_address %}
+          <div class="col-12">
+            <label class="text-muted small">Shipping Address</label>
+            <p class="mb-0">{{ delivery.customer_address }}</p>
+          </div>
+          {% endif %}
+          <div class="col-md-6">
+            <label class="text-muted small">Scheduled Date</label>
+            <p class="mb-0">
+              {{ delivery.scheduled_date[:10] if delivery.scheduled_date else
+              'Not set' }}
+            </p>
+          </div>
+          {% if delivery.shipped_date %}
+          <div class="col-md-6">
+            <label class="text-muted small">Shipped Date</label>
+            <p class="mb-0">{{ delivery.shipped_date[:10] }}</p>
+          </div>
+          {% endif %} {% if delivery.notes %}
+          <div class="col-12">
+            <label class="text-muted small">Notes</label>
+            <p class="mb-0">{{ delivery.notes }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Items -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Items</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th class="text-end">Ordered</th>
+                <th class="text-end">Picked</th>
+                <th class="text-end">Packed</th>
+                <th class="text-end">Validated</th>
+                <th class="text-end">Unit Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in delivery.items %}
+              <tr>
+                <td>
+                  <div>
+                    <div class="fw-semibold">
+                      {{ item.product_name or item.product_id }}
+                    </div>
+                    {% if item.product_sku %}
+                    <small class="text-muted">{{ item.product_sku }}</small>
+                    {% endif %}
+                  </div>
+                </td>
+                <td class="text-end">{{ item.ordered_quantity }}</td>
+                <td class="text-end">{{ item.picked_quantity or 0 }}</td>
+                <td class="text-end">{{ item.packed_quantity or 0 }}</td>
+                <td class="text-end">{{ item.validated_quantity or 0 }}</td>
+                <td class="text-end">
+                  ${{ "%.2f"|format(item.unit_price or 0) }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status History -->
+    {% if delivery.status_history %}
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Status History</h5>
+      </div>
+      <div class="card-body">
+        <div class="timeline">
+          {% for history in delivery.status_history %}
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="d-flex justify-content-between">
+                <span class="badge bg-info">{{ history.status|upper }}</span>
+                <small class="text-muted"
+                  >{{ history.changed_at[:19] if history.changed_at else 'N/A'
+                  }}</small
+                >
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Actions Sidebar -->
+  <div class="col-lg-4">
+    <div class="card sticky-top" style="top: 20px">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Actions</h5>
+      </div>
+      <div class="card-body">
+        {% if delivery.status == 'draft' %}
+        <form
+          method="POST"
+          action="{{ url_for('deliveries.transition_delivery_status', delivery_id=delivery._id) }}"
+        >
+          <input type="hidden" name="status" value="pick" />
+          <button type="submit" class="btn btn-primary w-100 mb-2">
+            <i class="bi bi-arrow-right-circle"></i> Start Picking
+          </button>
+        </form>
+        {% elif delivery.status == 'pick' %}
+        <form
+          method="POST"
+          action="{{ url_for('deliveries.transition_delivery_status', delivery_id=delivery._id) }}"
+        >
+          <input type="hidden" name="status" value="pack" />
+          <button type="submit" class="btn btn-primary w-100 mb-2">
+            <i class="bi bi-arrow-right-circle"></i> Start Packing
+          </button>
+        </form>
+        {% elif delivery.status == 'pack' %}
+        <form
+          method="POST"
+          action="{{ url_for('deliveries.transition_delivery_status', delivery_id=delivery._id) }}"
+        >
+          <input type="hidden" name="status" value="validate" />
+          <button type="submit" class="btn btn-primary w-100 mb-2">
+            <i class="bi bi-arrow-right-circle"></i> Validate
+          </button>
+        </form>
+        {% elif delivery.status == 'validate' %}
+        <form
+          method="POST"
+          action="{{ url_for('deliveries.transition_delivery_status', delivery_id=delivery._id) }}"
+          onsubmit="return confirm('This will decrease stock levels. Continue?');"
+        >
+          <input type="hidden" name="status" value="done" />
+          <button type="submit" class="btn btn-success w-100 mb-2">
+            <i class="bi bi-check-circle"></i> Complete Delivery
+          </button>
+        </form>
+        {% endif %} {% if delivery.status not in ['done', 'cancelled'] %}
+        <form
+          method="POST"
+          action="{{ url_for('deliveries.transition_delivery_status', delivery_id=delivery._id) }}"
+          onsubmit="return confirm('Cancel this delivery?');"
+        >
+          <input type="hidden" name="status" value="cancelled" />
+          <button type="submit" class="btn btn-outline-danger w-100 mb-2">
+            <i class="bi bi-x-circle"></i> Cancel
+          </button>
+        </form>
+        {% endif %}
+
+        <hr />
+        <a
+          href="{{ url_for('deliveries.list_deliveries') }}"
+          class="btn btn-outline-secondary w-100"
+        >
+          <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .timeline {
+    position: relative;
+    padding-left: 30px;
+  }
+  .timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+  }
+  .timeline-marker {
+    position: absolute;
+    left: -30px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #0d6efd;
+    border: 2px solid #fff;
+  }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: -25px;
+    top: 10px;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+  }
+</style>
+{% endblock %}

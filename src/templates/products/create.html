@@ -1,88 +1,160 @@
-{% extends "base.html" %}
-
-{% block title %}Create Product - Inventory Management{% endblock %}
-
-{% block breadcrumb %}
-<span class="breadcrumb-item"><a href="{{ url_for('products.list_products') }}">Products</a></span>
+{% extends "base.html" %} {% block title %}Create Product - Inventory
+Management{% endblock %} {% block breadcrumb %}
+<span class="breadcrumb-item"
+  ><a href="{{ url_for('products.list_products') }}">Products</a></span
+>
 <i class="bi bi-chevron-right"></i>
 <span class="breadcrumb-item">Create</span>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="page-header">
-    <div class="page-header-content">
-        <h1 class="page-title">Create New Product</h1>
-        <p class="page-description">Add a new product to the catalog</p>
-    </div>
+  <div class="page-header-content">
+    <h1 class="page-title">Create New Product</h1>
+    <p class="page-description">Add a new product to the catalog</p>
+  </div>
 </div>
 
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-body">
-                <form method="POST" action="{{ url_for('products.create_product') }}">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="sku" class="form-label">SKU <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="sku" name="sku" required>
-                            <div class="form-text">Unique Stock Keeping Unit code</div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="name" class="form-label">Product Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="name" name="name" required>
-                        </div>
-
-                        <div class="col-12">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="category_id" class="form-label">Category</label>
-                            <select class="form-select" id="category_id" name="category_id">
-                                <option value="">Select Category</option>
-                                {% for category in categories %}
-                                <option value="{{ category._id }}">{{ category.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="unit" class="form-label">Unit of Measure</label>
-                            <select class="form-select" id="unit" name="unit">
-                                <option value="pcs">Pieces (pcs)</option>
-                                <option value="kg">Kilograms (kg)</option>
-                                <option value="g">Grams (g)</option>
-                                <option value="l">Liters (l)</option>
-                                <option value="m">Meters (m)</option>
-                                <option value="box">Box</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="reorder_level" class="form-label">Reorder Level</label>
-                            <input type="number" class="form-control" id="reorder_level" name="reorder_level" value="0"
-                                min="0">
-                            <div class="form-text">Minimum stock level before alert</div>
-                        </div>
-
-                        <div class="col-12">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
-                                <label class="form-check-label" for="is_active">Active Product</label>
-                            </div>
-                        </div>
-
-                        <div class="col-12 mt-4 d-flex justify-content-end gap-2">
-                            <a href="{{ url_for('products.list_products') }}"
-                                class="btn btn-outline-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Create Product</button>
-                        </div>
-                    </div>
-                </form>
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('products.create_product') }}">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="sku" class="form-label"
+                >SKU <span class="text-danger">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="sku"
+                name="sku"
+                required
+              />
+              <div class="form-text">Unique Stock Keeping Unit code</div>
             </div>
-        </div>
+
+            <div class="col-md-6">
+              <label for="name" class="form-label"
+                >Product Name <span class="text-danger">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                required
+              />
+            </div>
+
+            <div class="col-12">
+              <label for="description" class="form-label">Description</label>
+              <textarea
+                class="form-control"
+                id="description"
+                name="description"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div class="col-md-6">
+              <label for="category_id" class="form-label">Category</label>
+              <select class="form-select" id="category_id" name="category_id">
+                <option value="">Select Category</option>
+                {% for category in categories %}
+                <option value="{{ category._id }}">{{ category.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label for="unit" class="form-label">Unit of Measure</label>
+              <select class="form-select" id="unit" name="unit">
+                <option value="pcs">Pieces (pcs)</option>
+                <option value="kg">Kilograms (kg)</option>
+                <option value="g">Grams (g)</option>
+                <option value="l">Liters (l)</option>
+                <option value="m">Meters (m)</option>
+                <option value="box">Box</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label for="reorder_level" class="form-label"
+                >Reorder Level</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="reorder_level"
+                name="reorder_level"
+                value="0"
+                min="0"
+              />
+              <div class="form-text">Minimum stock level before alert</div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="warehouse_id" class="form-label"
+                >Warehouse (for initial stock)</label
+              >
+              <select class="form-select" id="warehouse_id" name="warehouse_id">
+                <option value="">Skip initial stock</option>
+                {% for warehouse in warehouses %}
+                <option value="{{ warehouse._id }}">
+                  {{ warehouse.name }}
+                </option>
+                {% endfor %}
+              </select>
+              <div class="form-text">
+                Optional: Set initial stock in a warehouse
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="initial_stock" class="form-label"
+                >Initial Stock Quantity</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="initial_stock"
+                name="initial_stock"
+                value="0"
+                min="0"
+                step="0.01"
+              />
+              <div class="form-text">Only used if warehouse is selected</div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="is_active"
+                  name="is_active"
+                  checked
+                />
+                <label class="form-check-label" for="is_active"
+                  >Active Product</label
+                >
+              </div>
+            </div>
+
+            <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+              <a
+                href="{{ url_for('products.list_products') }}"
+                class="btn btn-outline-secondary"
+                >Cancel</a
+              >
+              <button type="submit" class="btn btn-primary">
+                Create Product
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

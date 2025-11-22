@@ -9,7 +9,7 @@ from datetime import datetime
 from bson import ObjectId
 
 from utils.constants import (
-    DELIVERY_STATUSES, DELIVERY_STATUS_PICK, DELIVERY_STATUS_FLOW
+    DELIVERY_STATUSES, DELIVERY_STATUS_DRAFT, DELIVERY_STATUS_FLOW
 )
 
 
@@ -69,7 +69,7 @@ class Delivery:
     """Delivery model for managing outgoing inventory."""
 
     def __init__(self, delivery_number, warehouse_id, customer_name,
-                 customer_address='', status=DELIVERY_STATUS_PICK,
+                 customer_address='', status=DELIVERY_STATUS_DRAFT,
                  scheduled_date=None, shipped_date=None, items=None,
                  notes='', created_by=None, _id=None, created_at=None,
                  updated_at=None, status_history=None):
@@ -79,7 +79,7 @@ class Delivery:
         self.warehouse_id = warehouse_id
         self.customer_name = customer_name
         self.customer_address = customer_address
-        self.status = status if status in DELIVERY_STATUSES else DELIVERY_STATUS_PICK
+        self.status = status if status in DELIVERY_STATUSES else DELIVERY_STATUS_DRAFT
         self.scheduled_date = scheduled_date or datetime.utcnow()
         self.shipped_date = shipped_date
         self.items = items or []
@@ -161,7 +161,7 @@ class Delivery:
             warehouse_id=doc.get('warehouse_id'),
             customer_name=doc.get('customer_name'),
             customer_address=doc.get('customer_address', ''),
-            status=doc.get('status', DELIVERY_STATUS_PICK),
+            status=doc.get('status', DELIVERY_STATUS_DRAFT),
             scheduled_date=doc.get('scheduled_date'),
             shipped_date=doc.get('shipped_date'),
             items=items,
