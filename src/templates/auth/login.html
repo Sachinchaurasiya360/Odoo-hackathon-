@@ -2,21 +2,25 @@
 endblock %} {% block meta_description %}Sign in to your Inventory Management
 System account to manage products, warehouses, and stock levels{% endblock %} {%
 block content %}
-<div class="container py-4 py-md-5">
+<div class="container py-4 py-md-5 animate-fade-in">
   <div class="row justify-content-center">
     <div class="col-12 col-sm-10 col-md-8 col-lg-5">
-      <article class="card shadow-lg border-0 hover-lift">
+      <article class="card elevation-4 border-0 hover-lift">
         <div class="card-body p-4 p-md-5">
           <!-- Header -->
           <header class="text-center mb-4">
-            <div class="mb-3" role="img" aria-label="Inventory System Logo">
+            <div
+              class="mb-3 animate-scale-in"
+              role="img"
+              aria-label="Inventory System Logo"
+            >
               <i
-                class="bi bi-boxes"
-                style="font-size: 3rem; color: var(--primary-color)"
+                class="bi bi-boxes gradient-text"
+                style="font-size: 3.5rem"
                 aria-hidden="true"
               ></i>
             </div>
-            <h1 class="h2 mb-2">Inventory System</h1>
+            <h1 class="h2 mb-2 fw-bold">Inventory System</h1>
             <p class="text-muted mb-0">Sign in to your account</p>
           </header>
 
@@ -28,9 +32,12 @@ block content %}
             novalidate
             aria-label="Login form"
           >
+            <!-- CSRF Protection -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
             <div class="mb-3">
-              <label for="username" class="form-label">
-                <i class="bi bi-person" aria-hidden="true"></i>
+              <label for="username" class="form-label fw-semibold">
+                <i class="bi bi-person text-primary" aria-hidden="true"></i>
                 Username or Email
               </label>
               <input
@@ -51,8 +58,8 @@ block content %}
             </div>
 
             <div class="mb-3">
-              <label for="password" class="form-label">
-                <i class="bi bi-lock" aria-hidden="true"></i>
+              <label for="password" class="form-label fw-semibold">
+                <i class="bi bi-lock text-primary" aria-hidden="true"></i>
                 Password
               </label>
               <input
@@ -72,7 +79,7 @@ block content %}
               <div class="text-end mt-2">
                 <a
                   href="{{ url_for('auth.forgot_password') }}"
-                  class="small text-decoration-none"
+                  class="small text-decoration-none transition-colors"
                   aria-label="Forgot password? Reset it here"
                 >
                   Forgot Password?
@@ -83,7 +90,7 @@ block content %}
             <div class="d-grid gap-2 mt-4">
               <button
                 type="submit"
-                class="btn btn-primary btn-lg"
+                class="btn btn-primary btn-lg hover-scale"
                 aria-label="Sign in to your account"
               >
                 <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>

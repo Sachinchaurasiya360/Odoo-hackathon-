@@ -9,7 +9,7 @@ Management{% endblock %} {% block breadcrumb %}
 <div class="page-header animate-fade-in">
   <div class="page-header-content">
     <h1 class="page-title">
-      <i class="bi bi-plus-circle"></i>
+      <i class="bi bi-plus-circle gradient-text"></i>
       Create New Product
     </h1>
     <p class="page-description">Add a new product to your inventory catalog</p>
@@ -18,10 +18,10 @@ Management{% endblock %} {% block breadcrumb %}
 
 <div class="row justify-content-center">
   <div class="col-lg-8">
-    <div class="card hover-lift animate-fade-in-up">
+    <div class="card elevation-3 hover-lift animate-fade-in-up">
       <div class="card-header">
         <h5 class="card-title mb-0">
-          <i class="bi bi-box-seam"></i>
+          <i class="bi bi-box-seam text-primary"></i>
           Product Information
         </h5>
       </div>
@@ -32,10 +32,13 @@ Management{% endblock %} {% block breadcrumb %}
           class="needs-validation"
           novalidate
         >
+          <!-- CSRF Protection -->
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
           <div class="row g-4">
             <div class="col-md-6">
-              <label for="sku" class="form-label">
-                <i class="bi bi-upc-scan"></i>
+              <label for="sku" class="form-label fw-semibold">
+                <i class="bi bi-upc-scan text-primary"></i>
                 SKU <span class="text-danger">*</span>
               </label>
               <input
@@ -51,8 +54,8 @@ Management{% endblock %} {% block breadcrumb %}
             </div>
 
             <div class="col-md-6">
-              <label for="name" class="form-label">
-                <i class="bi bi-tag"></i>
+              <label for="name" class="form-label fw-semibold">
+                <i class="bi bi-tag text-primary"></i>
                 Product Name <span class="text-danger">*</span>
               </label>
               <input
@@ -67,8 +70,8 @@ Management{% endblock %} {% block breadcrumb %}
             </div>
 
             <div class="col-12">
-              <label for="description" class="form-label">
-                <i class="bi bi-text-paragraph"></i>
+              <label for="description" class="form-label fw-semibold">
+                <i class="bi bi-text-paragraph text-primary"></i>
                 Description
               </label>
               <textarea
@@ -81,8 +84,8 @@ Management{% endblock %} {% block breadcrumb %}
             </div>
 
             <div class="col-md-6">
-              <label for="category_id" class="form-label">
-                <i class="bi bi-folder"></i>
+              <label for="category_id" class="form-label fw-semibold">
+                <i class="bi bi-folder text-primary"></i>
                 Category
               </label>
               <select class="form-select" id="category_id" name="category_id">
@@ -94,8 +97,8 @@ Management{% endblock %} {% block breadcrumb %}
             </div>
 
             <div class="col-md-6">
-              <label for="unit" class="form-label">
-                <i class="bi bi-rulers"></i>
+              <label for="unit" class="form-label fw-semibold">
+                <i class="bi bi-rulers text-primary"></i>
                 Unit of Measure
               </label>
               <select class="form-select" id="unit" name="unit">
@@ -109,8 +112,8 @@ Management{% endblock %} {% block breadcrumb %}
             </div>
 
             <div class="col-md-6">
-              <label for="reorder_level" class="form-label">
-                <i class="bi bi-exclamation-triangle"></i>
+              <label for="reorder_level" class="form-label fw-semibold">
+                <i class="bi bi-exclamation-triangle text-primary"></i>
                 Reorder Level
               </label>
               <input
@@ -126,8 +129,8 @@ Management{% endblock %} {% block breadcrumb %}
             </div>
 
             <div class="col-md-6">
-              <label for="warehouse_id" class="form-label">
-                <i class="bi bi-building"></i>
+              <label for="warehouse_id" class="form-label fw-semibold">
+                <i class="bi bi-building text-primary"></i>
                 Warehouse (for initial stock)
               </label>
               <select class="form-select" id="warehouse_id" name="warehouse_id">
@@ -144,8 +147,8 @@ Management{% endblock %} {% block breadcrumb %}
             </div>
 
             <div class="col-md-6">
-              <label for="initial_stock" class="form-label">
-                <i class="bi bi-stack"></i>
+              <label for="initial_stock" class="form-label fw-semibold">
+                <i class="bi bi-stack text-primary"></i>
                 Initial Stock Quantity
               </label>
               <input
@@ -182,12 +185,12 @@ Management{% endblock %} {% block breadcrumb %}
               <div class="d-flex gap-2 justify-content-end">
                 <a
                   href="{{ url_for('products.list_products') }}"
-                  class="btn btn-outline-secondary"
+                  class="btn btn-outline-secondary hover-lift"
                 >
                   <i class="bi bi-x-circle"></i>
                   Cancel
                 </a>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary hover-scale">
                   <i class="bi bi-check-circle"></i>
                   Create Product
                 </button>

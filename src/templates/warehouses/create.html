@@ -1,61 +1,96 @@
-{% extends "base.html" %}
-
-{% block title %}Create Warehouse - Inventory Management{% endblock %}
-
-{% block breadcrumb %}
-<span class="breadcrumb-item"><a href="{{ url_for('warehouses.list_warehouses') }}">Warehouses</a></span>
+{% extends "base.html" %} {% block title %}Create Warehouse - Inventory
+Management{% endblock %} {% block breadcrumb %}
+<span class="breadcrumb-item"
+  ><a href="{{ url_for('warehouses.list_warehouses') }}">Warehouses</a></span
+>
 <i class="bi bi-chevron-right"></i>
 <span class="breadcrumb-item">Create</span>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="page-header">
-    <div class="page-header-content">
-        <h1 class="page-title">Create New Warehouse</h1>
-        <p class="page-description">Add a new storage location</p>
-    </div>
+  <div class="page-header-content">
+    <h1 class="page-title">Create New Warehouse</h1>
+    <p class="page-description">Add a new storage location</p>
+  </div>
 </div>
 
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-body">
-                <form method="POST" action="{{ url_for('warehouses.create_warehouse') }}">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="code" class="form-label">Warehouse Code <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="code" name="code" required>
-                            <div class="form-text">Unique identifier (e.g., WH-001)</div>
-                        </div>
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <form
+          method="POST"
+          action="{{ url_for('warehouses.create_warehouse') }}"
+        >
+          <!-- CSRF Protection -->
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-                        <div class="col-md-6">
-                            <label for="name" class="form-label">Warehouse Name <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="name" name="name" required>
-                        </div>
-
-                        <div class="col-12">
-                            <label for="location" class="form-label">Location/Address</label>
-                            <textarea class="form-control" id="location" name="location" rows="3"></textarea>
-                        </div>
-
-                        <div class="col-12">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
-                                <label class="form-check-label" for="is_active">Active Warehouse</label>
-                            </div>
-                        </div>
-
-                        <div class="col-12 mt-4 d-flex justify-content-end gap-2">
-                            <a href="{{ url_for('warehouses.list_warehouses') }}"
-                                class="btn btn-outline-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Create Warehouse</button>
-                        </div>
-                    </div>
-                </form>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="code" class="form-label"
+                >Warehouse Code <span class="text-danger">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="code"
+                name="code"
+                required
+              />
+              <div class="form-text">Unique identifier (e.g., WH-001)</div>
             </div>
-        </div>
+
+            <div class="col-md-6">
+              <label for="name" class="form-label"
+                >Warehouse Name <span class="text-danger">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                required
+              />
+            </div>
+
+            <div class="col-12">
+              <label for="location" class="form-label">Location/Address</label>
+              <textarea
+                class="form-control"
+                id="location"
+                name="location"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div class="col-12">
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="is_active"
+                  name="is_active"
+                  checked
+                />
+                <label class="form-check-label" for="is_active"
+                  >Active Warehouse</label
+                >
+              </div>
+            </div>
+
+            <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+              <a
+                href="{{ url_for('warehouses.list_warehouses') }}"
+                class="btn btn-outline-secondary"
+                >Cancel</a
+              >
+              <button type="submit" class="btn btn-primary">
+                Create Warehouse
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

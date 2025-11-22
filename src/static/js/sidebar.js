@@ -1,19 +1,30 @@
-// Sidebar Toggle Functionality
+// Sidebar Toggle Functionality - v2.0
 
 document.addEventListener("DOMContentLoaded", function () {
   const sidebar = document.getElementById("sidebar");
   const menuToggle = document.getElementById("menuToggle");
   const sidebarToggle = document.getElementById("sidebarToggle");
   const sidebarOverlay = document.getElementById("sidebarOverlay");
+  const mainContent = document.getElementById("main-content");
 
-  // Toggle sidebar function
+  // Toggle sidebar function with animation
   function toggleSidebar() {
     const isShown = sidebar.classList.toggle("show");
+
+    // Add smooth transition class
+    sidebar.classList.add("transitioning");
+    setTimeout(() => sidebar.classList.remove("transitioning"), 300);
+
     if (sidebarOverlay) {
       sidebarOverlay.classList.toggle("show", isShown);
+      if (isShown) {
+        sidebarOverlay.classList.add("animate-fade-in");
+      } else {
+        sidebarOverlay.classList.remove("animate-fade-in");
+      }
     }
 
-    // Update ARIA attributes
+    // Update ARIA attributes for accessibility
     if (menuToggle) {
       menuToggle.setAttribute("aria-expanded", isShown);
     }
@@ -21,13 +32,22 @@ document.addEventListener("DOMContentLoaded", function () {
       sidebarToggle.setAttribute("aria-expanded", isShown);
     }
     sidebar.setAttribute("aria-hidden", !isShown);
+
+    // Prevent body scroll when sidebar is open on mobile
+    if (window.innerWidth <= 1024) {
+      document.body.style.overflow = isShown ? "hidden" : "";
+    }
   }
 
-  // Close sidebar function
+  // Close sidebar function with animation
   function closeSidebar() {
     sidebar.classList.remove("show");
+    sidebar.classList.add("transitioning");
+    setTimeout(() => sidebar.classList.remove("transitioning"), 300);
+
     if (sidebarOverlay) {
       sidebarOverlay.classList.remove("show");
+      sidebarOverlay.classList.remove("animate-fade-in");
     }
 
     // Update ARIA attributes
@@ -38,16 +58,25 @@ document.addEventListener("DOMContentLoaded", function () {
       sidebarToggle.setAttribute("aria-expanded", "false");
     }
     sidebar.setAttribute("aria-hidden", "true");
+
+    // Restore body scroll
+    document.body.style.overflow = "";
   }
 
   // Toggle sidebar on mobile menu button click
   if (menuToggle) {
-    menuToggle.addEventListener("click", toggleSidebar);
+    menuToggle.addEventListener("click", function (e) {
+      e.stopPropagation();
+      toggleSidebar();
+    });
   }
 
   // Toggle sidebar on sidebar close button click
   if (sidebarToggle) {
-    sidebarToggle.addEventListener("click", closeSidebar);
+    sidebarToggle.addEventListener("click", function (e) {
+      e.stopPropagation();
+      closeSidebar();
+    });
   }
 
   // Close sidebar when clicking overlay
@@ -57,18 +86,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Close sidebar when clicking outside on mobile
   document.addEventListener("click", function (event) {
-    if (window.innerWidth <= 991.98) {
+    if (window.innerWidth <= 1024) {
       const isClickInsideSidebar = sidebar.contains(event.target);
       const isClickOnToggle =
         (menuToggle && menuToggle.contains(event.target)) ||
         (sidebarToggle && sidebarToggle.contains(event.target));
-      const isClickOnOverlay =
-        sidebarOverlay && sidebarOverlay.contains(event.target);
 
       if (
         !isClickInsideSidebar &&
         !isClickOnToggle &&
-        !isClickOnOverlay &&
         sidebar.classList.contains("show")
       ) {
         closeSidebar();
@@ -77,10 +103,15 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Handle window resize
+  let resizeTimer;
   window.addEventListener("resize", function () {
-    if (window.innerWidth > 991.98) {
-      closeSidebar();
-    }
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (window.innerWidth > 1024) {
+        closeSidebar();
+        document.body.style.overflow = "";
+      }
+    }, 250);
   });
 
   // Keyboard navigation - ESC to close sidebar
@@ -88,7 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (event.key === "Escape" && sidebar.classList.contains("show")) {
       closeSidebar();
       if (menuToggle) {
-        menuToggle.focus(); // Return focus to menu toggle
+        menuToggle.focus(); // Return focus to menu toggle for accessibility
       }
     }
   });

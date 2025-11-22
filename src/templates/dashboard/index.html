@@ -8,7 +8,7 @@
     <div class="page-header mb-4">
         <div class="page-header-content">
             <h1 class="page-title">
-                <i class="bi bi-speedometer2"></i>
+                <i class="bi bi-speedometer2 gradient-text"></i>
                 Dashboard
             </h1>
             <p class="page-description">
@@ -17,7 +17,7 @@
             </p>
         </div>
         <div class="page-actions">
-            <button class="btn btn-outline-primary" onclick="window.location.reload()">
+            <button class="btn btn-outline-primary hover-lift" onclick="window.location.reload()">
                 <i class="bi bi-arrow-clockwise"></i>
                 Refresh
             </button>
@@ -25,8 +25,8 @@
     </div>
 
     <!-- Dynamic Filters -->
-    <div class="card mb-4 hover-lift">
-        <div class="card-header">
+    <div class="card mb-4 hover-lift elevation-2">
+        <div class="card-header bg-gradient-primary">
             <h5 class="mb-0">
                 <i class="bi bi-funnel-fill"></i>
                 Advanced Filters
@@ -36,7 +36,7 @@
             <form method="GET" action="{{ url_for('dashboard.index') }}" class="row g-3">
                 <div class="col-md-3">
                     <label for="doc_type" class="form-label">
-                        <i class="bi bi-file-earmark-text"></i>
+                        <i class="bi bi-file-earmark-text text-primary"></i>
                         Document Type
                     </label>
                     <select class="form-select" id="doc_type" name="doc_type">
@@ -50,7 +50,7 @@
 
                 <div class="col-md-3">
                     <label for="status" class="form-label">
-                        <i class="bi bi-flag"></i>
+                        <i class="bi bi-flag text-primary"></i>
                         Status
                     </label>
                     <select class="form-select" id="status" name="status">
@@ -71,7 +71,7 @@
 
                 <div class="col-md-3">
                     <label for="warehouse" class="form-label">
-                        <i class="bi bi-building"></i>
+                        <i class="bi bi-building text-primary"></i>
                         Warehouse
                     </label>
                     <select class="form-select" id="warehouse" name="warehouse">
@@ -86,7 +86,7 @@
 
                 <div class="col-md-3">
                     <label for="category" class="form-label">
-                        <i class="bi bi-folder"></i>
+                        <i class="bi bi-folder text-primary"></i>
                         Product Category
                     </label>
                     <select class="form-select" id="category" name="category">
@@ -100,11 +100,11 @@
                 </div>
 
                 <div class="col-12">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary hover-scale">
                         <i class="bi bi-search"></i>
                         Apply Filters
                     </button>
-                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary hover-lift">
                         <i class="bi bi-x-circle"></i>
                         Clear Filters
                     </a>
@@ -114,74 +114,68 @@
     </div>
 
     <!-- KPI Cards - Row 1 -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-3">
-            <div class="stat-card border-start border-primary border-4 stagger-item hover-lift">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <p class="text-muted mb-1 small fw-semibold text-uppercase">Total Products</p>
-                        <h3 class="mb-1">{{ total_products|default(0) }}</h3>
-                        <small class="text-muted">Active in system</small>
-                    </div>
-                    <div class="text-primary opacity-75" style="font-size: 3rem;">
-                        <i class="bi bi-box-seam-fill"></i>
-                    </div>
+    <div class="row g-4 mb-4 stagger-container">
+        <div class="col-md-3 stagger-item">
+            <div class="stat-card hover-lift">
+                <div class="stat-card-icon bg-gradient-primary">
+                    <i class="bi bi-box-seam-fill"></i>
+                </div>
+                <div class="stat-card-content">
+                    <div class="stat-card-label">Total Products</div>
+                    <div class="stat-card-value">{{ total_products|default(0) }}</div>
+                    <div class="stat-card-description">Active in system</div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="stat-card border-start border-warning border-4 stagger-item hover-lift">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <p class="text-muted mb-1 small fw-semibold text-uppercase">Low Stock Items</p>
-                        <h3 class="mb-1 text-warning">{{ low_stock_items|default(0) }}</h3>
-                        <small class="text-muted">Below reorder level</small>
-                    </div>
-                    <div class="text-warning opacity-75" style="font-size: 3rem;">
-                        <i class="bi bi-exclamation-triangle-fill"></i>
-                    </div>
+        <div class="col-md-3 stagger-item">
+            <div class="stat-card hover-lift">
+                <div class="stat-card-icon bg-gradient-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div class="stat-card-content">
+                    <div class="stat-card-label">Low Stock Items</div>
+                    <div class="stat-card-value text-warning">{{ low_stock_items|default(0) }}</div>
+                    <div class="stat-card-description">Below reorder level</div>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-3">
-            <div class="stat-card border-start border-danger border-4 stagger-item hover-lift">
-                <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <p class="text-muted mb-1 small fw-semibold text-uppercase">Out of Stock</p>
-                        <h3 class="mb-1 text-danger">{{ out_of_stock_items|default(0) }}</h3>
-                        <small class="text-muted">Zero quantity</small>
-                    </div>
-                    <div class="text-danger opacity-75" style="font-size: 3rem;">
-                        <i class="bi bi-x-octagon-fill"></i>
-                    </div>
+
+        <div class="col-md-3 stagger-item">
+            <div class="stat-card hover-lift">
+                <div class="stat-card-icon bg-gradient-danger">
+                    <i class="bi bi-x-octagon-fill"></i>
+                </div>
+                <div class="stat-card-content">
+                    <div class="stat-card-label">Out of Stock</div>
+                    <div class="stat-card-value text-danger">{{ out_of_stock_items|default(0) }}</div>
+                    <div class="stat-card-description">Zero quantity</div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="stat-card border-start border-info border-4 stagger-item hover-lift">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <p class="text-muted mb-1 small fw-semibold text-uppercase">Total Stock Units</p>
-                        <h3 class="mb-1 text-info">{{ total_stock|default(0)|int }}</h3>
-                        <small class="text-muted">Across all warehouses</small>
-                    </div>
-                    <div class="text-info opacity-75" style="font-size: 3rem;">
-                        <i class="bi bi-stack"></i>
-                    </div>
+        <div class="col-md-3 stagger-item">
+            <div class="stat-card hover-lift">
+                <div class="stat-card-icon bg-gradient-info">
+                    <i class="bi bi-stack"></i>
+                </div>
+                <div class="stat-card-content">
+                    <div class="stat-card-label">Total Stock Units</div>
+                    <div class="stat-card-value text-info">{{ total_stock|default(0)|int }}</div>
+                    <div class="stat-card-description">Across all warehouses</div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Pending Documents -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-3">
-            <div class="card h-100 hover-lift stagger-item">
-                <div class="card-header bg-primary bg-gradient text-white">
-                    <h6 class="mb-0">
+    <div class="row g-4 mb-4 stagger-container">
+        <div class="col-md-3 stagger-item">
+            <div class="card h-100 hover-lift elevation-2 card-primary">
+                <div class="card-header">
+                    <h6 class="mb-0 text-white">
                         <i class="bi bi-arrow-down-circle-fill"></i>
                         Pending Receipts
                     </h6>
@@ -194,7 +188,7 @@
                             {{ pending_receipts|default(0) }}
                         {% endif %}
                     </h1>
-                    <a href="{{ url_for('receipts.list_receipts') }}" class="btn btn-primary btn-sm">
+                    <a href="{{ url_for('receipts.list_receipts') }}" class="btn btn-primary btn-sm hover-scale">
                         View All
                         <i class="bi bi-arrow-right"></i>
                     </a>
@@ -202,10 +196,10 @@
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card h-100 hover-lift stagger-item">
-                <div class="card-header bg-success bg-gradient text-white">
-                    <h6 class="mb-0">
+        <div class="col-md-3 stagger-item">
+            <div class="card h-100 hover-lift elevation-2 card-success">
+                <div class="card-header">
+                    <h6 class="mb-0 text-white">
                         <i class="bi bi-arrow-up-circle-fill"></i>
                         Pending Deliveries
                     </h6>

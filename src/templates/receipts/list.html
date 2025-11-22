@@ -13,13 +13,13 @@
 <div class="page-header">
     <div class="page-header-content">
         <h1 class="page-title">
-            <i class="bi bi-arrow-down-circle"></i>
+            <i class="bi bi-arrow-down-circle gradient-text"></i>
             Receipts
         </h1>
         <p class="page-description">Manage incoming inventory receipts</p>
     </div>
     <div class="page-actions">
-        <a href="{{ url_for('receipts.create_receipt') }}" class="btn btn-primary">
+        <a href="{{ url_for('receipts.create_receipt') }}" class="btn btn-primary hover-scale">
             <i class="bi bi-plus-lg"></i>
             New Receipt
         </a>
@@ -29,8 +29,8 @@
 <!-- Status Cards -->
 <div class="row g-3 mb-4">
     <div class="col-md-3">
-        <div class="stat-card">
-            <div class="stat-icon bg-secondary">
+        <div class="stat-card hover-lift animate-fade-in" style="animation-delay: 0.1s">
+            <div class="stat-card-icon bg-gradient-secondary">
                 <i class="bi bi-file-earmark"></i>
             </div>
             <div class="stat-content">
@@ -40,8 +40,8 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="stat-card">
-            <div class="stat-icon bg-info">
+        <div class="stat-card hover-lift animate-fade-in" style="animation-delay: 0.2s">
+            <div class="stat-card-icon bg-gradient-info">
                 <i class="bi bi-clock"></i>
             </div>
             <div class="stat-content">
@@ -51,8 +51,8 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="stat-card">
-            <div class="stat-icon bg-warning">
+        <div class="stat-card hover-lift animate-fade-in" style="animation-delay: 0.3s">
+            <div class="stat-card-icon bg-gradient-warning">
                 <i class="bi bi-check-circle"></i>
             </div>
             <div class="stat-content">
@@ -62,8 +62,8 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="stat-card">
-            <div class="stat-icon bg-success">
+        <div class="stat-card hover-lift animate-fade-in" style="animation-delay: 0.4s">
+            <div class="stat-card-icon bg-gradient-success">
                 <i class="bi bi-check-all"></i>
             </div>
             <div class="stat-content">
@@ -75,11 +75,14 @@
 </div>
 
 <!-- Filters -->
-<div class="card mb-4">
+<div class="card elevation-2 mb-4">
     <div class="card-body">
         <form method="GET" class="row g-3">
             <div class="col-md-3">
-                <label for="warehouse" class="form-label">Warehouse</label>
+                <label for="warehouse" class="form-label fw-semibold">
+                    <i class="bi bi-building text-primary"></i>
+                    Warehouse
+                </label>
                 <select class="form-select" id="warehouse" name="warehouse_id">
                     <option value="">All Warehouses</option>
                     {% for warehouse in warehouses %}
@@ -91,7 +94,10 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label for="status" class="form-label">Status</label>
+                <label for="status" class="form-label fw-semibold">
+                    <i class="bi bi-flag text-primary"></i>
+                    Status
+                </label>
                 <select class="form-select" id="status" name="status">
                     <option value="">All Statuses</option>
                     <option value="draft" {% if request.args.get('status')=='draft' %}selected{% endif %}>Draft</option>
@@ -104,15 +110,18 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label for="date_from" class="form-label">Date From</label>
+                <label for="date_from" class="form-label fw-semibold">
+                    <i class="bi bi-calendar text-primary"></i>
+                    Date From
+                </label>
                 <input type="date" class="form-control" id="date_from" name="date_from"
                     value="{{ request.args.get('date_from', '') }}">
             </div>
             <div class="col-md-3 d-flex align-items-end">
-                <button type="submit" class="btn btn-secondary me-2">
+                <button type="submit" class="btn btn-secondary hover-scale me-2">
                     <i class="bi bi-funnel"></i> Filter
                 </button>
-                <a href="{{ url_for('receipts.list_receipts') }}" class="btn btn-outline-secondary">
+                <a href="{{ url_for('receipts.list_receipts') }}" class="btn btn-outline-secondary hover-lift">
                     <i class="bi bi-x-lg"></i> Clear
                 </a>
             </div>
@@ -121,9 +130,12 @@
 </div>
 
 <!-- Receipts Table -->
-<div class="card">
+<div class="card elevation-2">
     <div class="card-header">
-        <h5 class="card-title mb-0">Receipt List</h5>
+        <h5 class="card-title mb-0">
+            <i class="bi bi-table text-primary"></i>
+            Receipt List
+        </h5>
     </div>
     {% call render_table(['Receipt #', 'Supplier', 'Warehouse', 'Scheduled Date', 'Items', 'Status'], receipts,
     actions=True) %}
@@ -139,21 +151,21 @@
         <td>{{ receipt.warehouse_name or receipt.warehouse_id }}</td>
         <td>{{ receipt.scheduled_date|date_format }}</td>
         <td>
-            <span class="badge bg-light text-dark">{{ receipt.items|length }} items</span>
+            <span class="badge badge-secondary">{{ receipt.items|length }} items</span>
         </td>
         <td>
-            <span class="badge bg-{{ receipt.status|status_badge }}">
+            <span class="badge badge-{{ receipt.status|status_badge }}">
                 {{ receipt.status|upper }}
             </span>
         </td>
         <td class="table-actions">
             <div class="btn-group btn-group-sm">
-                <a href="{{ url_for('receipts.view_receipt', receipt_id=receipt._id) }}" class="btn btn-outline-primary"
+                <a href="{{ url_for('receipts.view_receipt', receipt_id=receipt._id) }}" class="btn btn-outline-primary hover-scale"
                     title="View">
                     <i class="bi bi-eye"></i>
                 </a>
                 {% if receipt.status in ['draft', 'waiting', 'ready'] %}
-                <button type="button" class="btn btn-outline-success"
+                <button type="button" class="btn btn-outline-success hover-scale"
                     onclick="transitionReceipt('{{ receipt._id }}', 'next')" title="Next Status">
                     <i class="bi bi-arrow-right-circle"></i>
                 </button>

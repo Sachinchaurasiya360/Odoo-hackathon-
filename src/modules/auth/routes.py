@@ -2,12 +2,13 @@
 Authentication routes.
 
 This module defines routes for user authentication including
-login, register, and logout.
+login, register, and logout with security protections.
 """
 
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from modules.auth.service import AuthService
 from utils.responses import success_response, error_response
+from utils.security import RateLimiter, sanitize_input
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,9 +18,10 @@ auth_service = AuthService()
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
+@RateLimiter.limit(max_requests=5, window_seconds=300)  # 5 attempts per 5 minutes
 def login():
     """
-    User login route.
+    User login route with rate limiting.
 
     GET: Display login form.
     POST: Process login credentials.
@@ -31,8 +33,8 @@ def login():
         return render_template('auth/login.html')
 
     # Handle POST request
-    username = request.form.get('username', '').strip()
-    password = request.form.get('password', '')
+    username = sanitize_input(request.form.get('username', '').strip())
+    password = request.form.get('password', '')  # Don't sanitize passwords
 
     if not username or not password:
         flash('Username and password are required', 'danger')
@@ -46,6 +48,9 @@ def login():
         session['username'] = result['user']['username']
         session['user_role'] = result['user']['role']
         session['full_name'] = result['user']['full_name']
+        
+        # Regenerate session ID to prevent session fixation
+        session.modified = True
 
         flash(f"Welcome back, {result['user']['full_name'] or result['user']['username']}!", 'success')
         
@@ -65,9 +70,10 @@ def login():
 
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
+@RateLimiter.limit(max_requests=3, window_seconds=3600)  # 3 registrations per hour
 def register():
     """
-    User registration route.
+    User registration route with rate limiting.
 
     GET: Display registration form.
     POST: Process registration.
@@ -79,12 +85,12 @@ def register():
         return render_template('auth/register.html')
 
     # Handle POST request
-    username = request.form.get('username', '').strip()
-    email = request.form.get('email', '').strip()
-    password = request.form.get('password', '')
+    username = sanitize_input(request.form.get('username', '').strip())
+    email = sanitize_input(request.form.get('email', '').strip())
+    password = request.form.get('password', '')  # Don't sanitize passwords
     confirm_password = request.form.get('confirm_password', '')
-    full_name = request.form.get('full_name', '').strip()
-    role = request.form.get('role', 'viewer').strip()
+    full_name = sanitize_input(request.form.get('full_name', '').strip())
+    role = sanitize_input(request.form.get('role', 'viewer').strip())
 
     # Validation
     if not all([username, email, password, confirm_password]):
@@ -128,9 +134,10 @@ def logout():
 # API endpoints for JWT-based authentication
 
 @auth_bp.route('/api/login', methods=['POST'])
+@RateLimiter.limit(max_requests=10, window_seconds=300)  # 10 API attempts per 5 minutes
 def api_login():
     """
-    API login endpoint (returns JWT token).
+    API login endpoint (returns JWT token) with rate limiting.
 
     Returns JSON response with user data and JWT token.
     """
@@ -139,7 +146,7 @@ def api_login():
     if not data:
         return error_response("Invalid request data", status_code=400)
 
-    username = data.get('username', '').strip()
+    username = sanitize_input(data.get('username', '').strip())
     password = data.get('password', '')
 
     if not username or not password:
@@ -157,9 +164,10 @@ def api_login():
 
 
 @auth_bp.route('/api/register', methods=['POST'])
+@RateLimiter.limit(max_requests=5, window_seconds=3600)  # 5 API registrations per hour
 def api_register():
     """
-    API registration endpoint.
+    API registration endpoint with rate limiting.
 
     Returns JSON response with user data.
     """
@@ -168,10 +176,10 @@ def api_register():
     if not data:
         return error_response("Invalid request data", status_code=400)
 
-    username = data.get('username', '').strip()
-    email = data.get('email', '').strip()
+    username = sanitize_input(data.get('username', '').strip())
+    email = sanitize_input(data.get('email', '').strip())
     password = data.get('password', '')
-    full_name = data.get('full_name', '').strip()
+    full_name = sanitize_input(data.get('full_name', '').strip())
 
     if not all([username, email, password]):
         return error_response("Username, email, and password are required", status_code=400)

@@ -8,6 +8,9 @@ blueprints, middleware, and error handlers.
 from flask import Flask, render_template, session
 from config.settings import get_config
 from config.database import db
+from utils.security import (
+    SecurityHeaders, CSRFProtection, RateLimiter, SecurityConfig
+)
 import logging
 import os
 
@@ -36,6 +39,14 @@ def create_app(config_name=None):
     config = get_config(config_name)
     app.config.from_object(config)
 
+    # Validate security configuration
+    SecurityConfig.validate_config(app)
+
+    # Initialize security middleware
+    SecurityHeaders.init_app(app)
+    CSRFProtection.init_app(app)
+    RateLimiter.init_app(app)
+
     # Initialize session storage (Redis for production, filesystem for dev)
     init_session_storage(app)
 
@@ -60,6 +71,7 @@ def create_app(config_name=None):
     register_template_filters(app)
 
     logger.info(f"Application created with config: {config_name or 'default'}")
+    logger.info("Security features enabled: CSRF, Security Headers, Rate Limiting")
 
     return app
 

@@ -1,100 +1,174 @@
-// Main JavaScript for Inventory Management System
+// Main JavaScript for Inventory Management System - v2.0
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-hide alerts after 5 seconds
-    const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
-    alerts.forEach(alert => {
-        setTimeout(() => {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        }, 5000);
-    });
+    // Initialize all components
+    initFlashMessages();
+    initDeleteConfirmations();
+    initFormValidation();
+    initTooltips();
+    initPopovers();
+    initSmoothScroll();
+    initScrollReveal();
+    initAnimations();
+    initNumberFormatting();
 
-    // Confirm delete actions
-    const deleteButtons = document.querySelectorAll('[data-confirm-delete]');
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            if (!confirm('Are you sure you want to delete this item?')) {
+    // Auto-hide flash messages after 5 seconds with animation
+    function initFlashMessages() {
+        const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+        alerts.forEach((alert, index) => {
+            // Stagger animation
+            alert.style.animationDelay = `${index * 0.1}s`;
+            
+            setTimeout(() => {
+                alert.classList.add('animate-fade-out');
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 300);
+            }, 5000);
+        });
+    }
+
+    // Enhanced delete confirmations with modal
+    function initDeleteConfirmations() {
+        const deleteButtons = document.querySelectorAll('[data-confirm-delete]');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
                 e.preventDefault();
-            }
-        });
-    });
-
-    // Dynamic form rows (for adding items)
-    window.addItemRow = function(tableId, templateId) {
-        const table = document.getElementById(tableId);
-        const template = document.getElementById(templateId);
-        
-        if (table && template) {
-            const tbody = table.querySelector('tbody');
-            const rowCount = tbody.querySelectorAll('tr').length;
-            const newRow = template.content.cloneNode(true);
-            
-            // Update indices in the new row
-            newRow.querySelectorAll('[name]').forEach(input => {
-                const name = input.getAttribute('name');
-                input.setAttribute('name', name.replace('[0]', `[${rowCount}]`));
+                const itemName = this.dataset.itemName || 'this item';
+                
+                if (confirm(`Are you sure you want to delete ${itemName}? This action cannot be undone.`)) {
+                    // If button is in a form, submit it
+                    const form = this.closest('form');
+                    if (form) {
+                        form.submit();
+                    } else if (this.href) {
+                        window.location.href = this.href;
+                    }
+                }
             });
-            
-            tbody.appendChild(newRow);
-        }
-    };
-
-    // Remove item row
-    window.removeItemRow = function(button) {
-        const row = button.closest('tr');
-        if (row) {
-            row.remove();
-        }
-    };
-
-    // Number formatting
-    const numberInputs = document.querySelectorAll('input[type="number"]');
-    numberInputs.forEach(input => {
-        input.addEventListener('blur', function() {
-            if (this.value) {
-                this.value = parseFloat(this.value).toFixed(2);
-            }
         });
-    });
+    }
 
-    // Form validation
-    const forms = document.querySelectorAll('.needs-validation');
-    forms.forEach(form => {
-        form.addEventListener('submit', function(event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            form.classList.add('was-validated');
+    // Enhanced form validation with custom messages
+    function initFormValidation() {
+        const forms = document.querySelectorAll('.needs-validation');
+        forms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    // Focus first invalid field
+                    const firstInvalid = form.querySelector(':invalid');
+                    if (firstInvalid) {
+                        firstInvalid.focus();
+                        firstInvalid.classList.add('animate-shake');
+                        setTimeout(() => firstInvalid.classList.remove('animate-shake'), 500);
+                    }
+                }
+                form.classList.add('was-validated');
+            });
+
+            // Real-time validation
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.checkValidity()) {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    } else {
+                        this.classList.remove('is-valid');
+                        this.classList.add('is-invalid');
+                    }
+                });
+            });
         });
-    });
+    }
 
-    // Search with debounce
-    window.debounce = function(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    };
+    // Initialize Bootstrap tooltips with modern styling
+    function initTooltips() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                animation: true,
+                delay: { show: 300, hide: 100 }
+            });
+        });
+    }
 
-    // Initialize tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    // Initialize Bootstrap popovers
+    function initPopovers() {
+        const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl, {
+                trigger: 'focus',
+                animation: true
+            });
+        });
+    }
 
-    // Initialize popovers
-    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-    popoverTriggerList.map(function (popoverTriggerEl) {
-        return new bootstrap.Popover(popoverTriggerEl);
-    });
-});
+    // Smooth scroll for anchor links
+    function initSmoothScroll() {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const target = document.querySelector(targetId);
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    }
+
+    // Scroll reveal animations
+    function initScrollReveal() {
+        const revealElements = document.querySelectorAll('.scroll-reveal');
+        
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+    }
+
+    // Stagger animations for items in a container
+    function initAnimations() {
+        const staggerContainers = document.querySelectorAll('.stagger-container');
+        staggerContainers.forEach(container => {
+            const items = container.querySelectorAll('.stagger-item');
+            items.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.1}s`;
+                item.classList.add('animate-fade-in-up');
+            });
+        });
+    }
+
+    // Number input formatting
+    function initNumberFormatting() {
+        const numberInputs = document.querySelectorAll('input[type="number"]');
+        numberInputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.value && this.step !== "1") {
+                    this.value = parseFloat(this.value).toFixed(2);
+                }
+            });
+        });
+    }
 
 // AJAX helper function
 function makeRequest(url, method = 'GET', data = null) {
