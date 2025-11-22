@@ -21,23 +21,21 @@
 <body class="{% if not session.get('user_id') %}auth-page{% endif %}">
 
     {% if session.get('user_id') %}
-    <!-- ================== LOGGED-IN LAYOUT ================== -->
+    <!-- ================== LOGGED-IN LAYOUT START ================== -->
     <div class="app-container">
-
         {% include 'components/sidebar.html' %}
 
         <div class="main-content">
             {% include 'components/navbar.html' %}
 
-            <!-- FLASH MESSAGES -->
+            <!-- FLASH MESSAGES (APP) -->
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
             <div class="flash-messages">
                 {% for category, message in messages %}
                 <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
                     <i
-                        class="bi bi-{% if category == 'success' %}check-circle{% elif category == 'danger' %}
-                        exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}">
+                        class="bi bi-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}">
                     </i>
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -47,46 +45,49 @@
             {% endif %}
             {% endwith %}
 
-            <!-- ======== MAIN CONTENT BLOCK (ONLY ONE!) ======== -->
             <div id="page-wrapper">
-                {% block content %}{% endblock %}
-            </div>
+                {% else %}
+                <!-- ================== AUTH LAYOUT START ================== -->
 
-            <footer class="page-footer">
-                <div class="footer-content">
-                    <span>&copy; 2024 Inventory Management System</span>
-                    <span class="footer-links">
-                        <a href="#">Help</a>
-                        <a href="#">Privacy</a>
-                        <a href="#">Terms</a>
-                    </span>
+                <!-- FLASH MESSAGES (AUTH) -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="container mt-4">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
                 </div>
-            </footer>
-        </div>
-    </div>
+                {% endif %}
+                {% endwith %}
 
-    {% else %}
-    <!-- ================== AUTH LAYOUT (LOGIN/REGISTER) ================== -->
+                <div class="auth-container mt-5">
+                    {% endif %}
 
-    <!-- FLASH MESSAGES -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div class="container mt-4">
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    {% endwith %}
+                    <!-- ======== COMMON CONTENT BLOCK ======== -->
+                    {% block content %}{% endblock %}
 
-    <div class="auth-container mt-5">
-        <!-- SAME SINGLE CONTENT BLOCK (NO DUPLICATE) -->
-        {% block content %}{% endblock %}
-    </div>
+                    {% if session.get('user_id') %}
+                    <!-- ================== LOGGED-IN LAYOUT END ================== -->
+                </div> <!-- End page-wrapper -->
 
+                <footer class="page-footer">
+                    <div class="footer-content">
+                        <span>&copy; 2024 Inventory Management System</span>
+                        <span class="footer-links">
+                            <a href="#">Help</a>
+                            <a href="#">Privacy</a>
+                            <a href="#">Terms</a>
+                        </span>
+                    </div>
+                </footer>
+            </div> <!-- End main-content -->
+        </div> <!-- End app-container -->
+        {% else %}
+        <!-- ================== AUTH LAYOUT END ================== -->
+    </div> <!-- End auth-container -->
     {% endif %}
 
     <!-- JS Files -->
