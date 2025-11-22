@@ -9,6 +9,7 @@ from datetime import datetime
 from bson import ObjectId
 
 from utils.constants import TRANSACTION_TYPES
+from utils.serializers import serialize_object_id, serialize_datetime
 
 
 class StockLevel:
@@ -52,13 +53,13 @@ class StockLevel:
             dict: Stock level data as dictionary.
         """
         return {
-            '_id': str(self._id),
-            'product_id': str(self.product_id),
-            'warehouse_id': str(self.warehouse_id),
+            '_id': serialize_object_id(self._id),
+            'product_id': serialize_object_id(self.product_id),
+            'warehouse_id': serialize_object_id(self.warehouse_id),
             'quantity': self.quantity,
             'reserved_quantity': self.reserved_quantity,
             'available_quantity': self.available_quantity,
-            'last_updated': self.last_updated.isoformat() if self.last_updated else None
+            'last_updated': serialize_datetime(self.last_updated)
         }
 
     def to_mongo(self):
@@ -154,20 +155,20 @@ class StockLedger:
             dict: Stock ledger data as dictionary.
         """
         return {
-            '_id': str(self._id),
-            'product_id': str(self.product_id),
-            'warehouse_id': str(self.warehouse_id),
-            'transaction_date': self.transaction_date.isoformat() if self.transaction_date else None,
+            '_id': serialize_object_id(self._id),
+            'product_id': serialize_object_id(self.product_id),
+            'warehouse_id': serialize_object_id(self.warehouse_id),
+            'transaction_date': serialize_datetime(self.transaction_date),
             'transaction_type': self.transaction_type,
             'reference_type': self.reference_type,
-            'reference_id': str(self.reference_id),
+            'reference_id': serialize_object_id(self.reference_id),
             'reference_number': self.reference_number,
             'quantity_change': self.quantity_change,
             'quantity_before': self.quantity_before,
             'quantity_after': self.quantity_after,
             'notes': self.notes,
-            'created_by': str(self.created_by),
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_by': serialize_object_id(self.created_by),
+            'created_at': serialize_datetime(self.created_at)
         }
 
     def to_mongo(self):

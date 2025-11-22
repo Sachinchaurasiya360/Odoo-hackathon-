@@ -1,66 +1,103 @@
 <!-- Top Navigation Bar Component -->
 <header class="topbar" role="banner">
   <div class="topbar-left">
-    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
-      <i class="bi bi-list"></i>
+    <button
+      class="menu-toggle"
+      id="menuToggle"
+      aria-label="Toggle sidebar navigation"
+      aria-expanded="true"
+      aria-controls="sidebar"
+    >
+      <i class="bi bi-list" aria-hidden="true"></i>
     </button>
-    <div class="breadcrumb" aria-label="Breadcrumb">
+    <nav class="breadcrumb" aria-label="Breadcrumb navigation">
       {% block breadcrumb %}
       <span class="breadcrumb-item">Dashboard</span>
       {% endblock %}
-    </div>
+    </nav>
   </div>
 
   <div class="topbar-right">
     <!-- Search -->
-    <div class="search-box">
-      <i class="bi bi-search"></i>
+    <div class="search-box d-none d-md-flex">
+      <label for="global-search" class="visually-hidden"
+        >Search inventory</label
+      >
+      <i class="bi bi-search" aria-hidden="true"></i>
       <input
         type="search"
+        id="global-search"
         placeholder="Search products, documents..."
         class="search-input"
-        aria-label="Search"
+        aria-label="Search products, documents, and more"
+        autocomplete="off"
       />
     </div>
+
+    <!-- Mobile Search Button -->
+    <button
+      class="icon-button d-md-none"
+      aria-label="Open search"
+      data-bs-toggle="modal"
+      data-bs-target="#searchModal"
+    >
+      <i class="bi bi-search" aria-hidden="true"></i>
+    </button>
 
     <!-- Notifications -->
     <div class="topbar-item dropdown">
       <button
         class="icon-button"
+        id="notificationDropdown"
         data-bs-toggle="dropdown"
         aria-expanded="false"
-        aria-label="Notifications"
+        aria-label="Notifications, 3 unread"
+        aria-haspopup="true"
       >
-        <i class="bi bi-bell"></i>
-        <span class="badge badge-danger notification-badge">3</span>
+        <i class="bi bi-bell" aria-hidden="true"></i>
+        <span
+          class="badge badge-danger notification-badge"
+          aria-label="3 new notifications"
+          >3</span
+        >
       </button>
-      <ul class="dropdown-menu dropdown-menu-end">
-        <li class="dropdown-header">Notifications</li>
+      <ul
+        class="dropdown-menu dropdown-menu-end"
+        aria-labelledby="notificationDropdown"
+      >
+        <li><h6 class="dropdown-header">Notifications</h6></li>
         <li>
           <hr class="dropdown-divider" />
         </li>
         <li>
-          <a class="dropdown-item" href="#">
-            <i class="bi bi-exclamation-triangle text-warning"></i>
-            Low stock alert: Product A
+          <a class="dropdown-item" href="#" role="menuitem">
+            <i
+              class="bi bi-exclamation-triangle text-warning"
+              aria-hidden="true"
+            ></i>
+            <span>Low stock alert: Product A</span>
           </a>
         </li>
         <li>
-          <a class="dropdown-item" href="#">
-            <i class="bi bi-check-circle text-success"></i>
-            Receipt RCP-001 completed
+          <a class="dropdown-item" href="#" role="menuitem">
+            <i class="bi bi-check-circle text-success" aria-hidden="true"></i>
+            <span>Receipt RCP-001 completed</span>
           </a>
         </li>
         <li>
-          <a class="dropdown-item" href="#">
-            <i class="bi bi-info-circle text-info"></i>
-            New delivery pending
+          <a class="dropdown-item" href="#" role="menuitem">
+            <i class="bi bi-info-circle text-info" aria-hidden="true"></i>
+            <span>New delivery pending</span>
           </a>
         </li>
         <li>
           <hr class="dropdown-divider" />
         </li>
-        <li><a class="dropdown-item text-center" href="#">View all</a></li>
+        <li>
+          <a class="dropdown-item text-center" href="#" role="menuitem"
+            >View all notifications</a
+          >
+        </li>
       </ul>
     </div>
 
@@ -68,44 +105,101 @@
     <div class="topbar-item dropdown">
       <button
         class="user-button"
+        id="userMenuDropdown"
         data-bs-toggle="dropdown"
         aria-expanded="false"
-        aria-label="User menu"
+        aria-label="User menu for {{ session.get('username') }}"
+        aria-haspopup="true"
       >
-        <div class="user-avatar-small">
+        <div class="user-avatar-small" aria-hidden="true">
           <i class="bi bi-person-circle"></i>
         </div>
-        <span class="user-name-small">{{ session.get('username') }}</span>
-        <i class="bi bi-chevron-down"></i>
+        <span class="user-name-small d-none d-sm-inline"
+          >{{ session.get('username') }}</span
+        >
+        <i class="bi bi-chevron-down" aria-hidden="true"></i>
       </button>
-      <ul class="dropdown-menu dropdown-menu-end">
-        <li class="dropdown-header">
-          {{ session.get('full_name') or session.get('username') }}
-          <br />
-          <small class="text-muted">{{ session.get('user_role') }}</small>
+      <ul
+        class="dropdown-menu dropdown-menu-end"
+        aria-labelledby="userMenuDropdown"
+      >
+        <li>
+          <h6 class="dropdown-header">
+            {{ session.get('full_name') or session.get('username') }}
+            <br />
+            <small class="text-muted">{{ session.get('user_role') }}</small>
+          </h6>
         </li>
         <li>
           <hr class="dropdown-divider" />
         </li>
         <li>
-          <a class="dropdown-item" href="{{ url_for('profile.view') }}">
-            <i class="bi bi-person"></i> My Profile
+          <a
+            class="dropdown-item"
+            href="{{ url_for('profile.view') }}"
+            role="menuitem"
+          >
+            <i class="bi bi-person" aria-hidden="true"></i> My Profile
           </a>
         </li>
         <li>
-          <a class="dropdown-item" href="{{ url_for('settings.index') }}">
-            <i class="bi bi-gear"></i> Settings
+          <a
+            class="dropdown-item"
+            href="{{ url_for('settings.index') }}"
+            role="menuitem"
+          >
+            <i class="bi bi-gear" aria-hidden="true"></i> Settings
           </a>
         </li>
         <li>
           <hr class="dropdown-divider" />
         </li>
         <li>
-          <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
-            <i class="bi bi-box-arrow-right"></i> Logout
+          <a
+            class="dropdown-item"
+            href="{{ url_for('auth.logout') }}"
+            role="menuitem"
+          >
+            <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Logout
           </a>
         </li>
       </ul>
     </div>
   </div>
 </header>
+
+<!-- Mobile Search Modal -->
+<div
+  class="modal fade"
+  id="searchModal"
+  tabindex="-1"
+  aria-labelledby="searchModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="searchModalLabel">Search</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <label for="mobile-search" class="visually-hidden"
+          >Search inventory</label
+        >
+        <input
+          type="search"
+          id="mobile-search"
+          class="form-control"
+          placeholder="Search products, documents..."
+          aria-label="Search products and documents"
+          autocomplete="off"
+        />
+      </div>
+    </div>
+  </div>
+</div>

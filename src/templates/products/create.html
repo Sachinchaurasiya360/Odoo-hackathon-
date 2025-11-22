@@ -6,58 +6,85 @@ Management{% endblock %} {% block breadcrumb %}
 <i class="bi bi-chevron-right"></i>
 <span class="breadcrumb-item">Create</span>
 {% endblock %} {% block content %}
-<div class="page-header">
+<div class="page-header animate-fade-in">
   <div class="page-header-content">
-    <h1 class="page-title">Create New Product</h1>
-    <p class="page-description">Add a new product to the catalog</p>
+    <h1 class="page-title">
+      <i class="bi bi-plus-circle"></i>
+      Create New Product
+    </h1>
+    <p class="page-description">Add a new product to your inventory catalog</p>
   </div>
 </div>
 
 <div class="row justify-content-center">
   <div class="col-lg-8">
-    <div class="card">
+    <div class="card hover-lift animate-fade-in-up">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="bi bi-box-seam"></i>
+          Product Information
+        </h5>
+      </div>
       <div class="card-body">
-        <form method="POST" action="{{ url_for('products.create_product') }}">
-          <div class="row g-3">
+        <form
+          method="POST"
+          action="{{ url_for('products.create_product') }}"
+          class="needs-validation"
+          novalidate
+        >
+          <div class="row g-4">
             <div class="col-md-6">
-              <label for="sku" class="form-label"
-                >SKU <span class="text-danger">*</span></label
-              >
+              <label for="sku" class="form-label">
+                <i class="bi bi-upc-scan"></i>
+                SKU <span class="text-danger">*</span>
+              </label>
               <input
                 type="text"
                 class="form-control"
                 id="sku"
                 name="sku"
+                placeholder="Enter unique SKU code"
                 required
               />
               <div class="form-text">Unique Stock Keeping Unit code</div>
+              <div class="invalid-feedback">Please provide a SKU</div>
             </div>
 
             <div class="col-md-6">
-              <label for="name" class="form-label"
-                >Product Name <span class="text-danger">*</span></label
-              >
+              <label for="name" class="form-label">
+                <i class="bi bi-tag"></i>
+                Product Name <span class="text-danger">*</span>
+              </label>
               <input
                 type="text"
                 class="form-control"
                 id="name"
                 name="name"
+                placeholder="Enter product name"
                 required
               />
+              <div class="invalid-feedback">Please provide a product name</div>
             </div>
 
             <div class="col-12">
-              <label for="description" class="form-label">Description</label>
+              <label for="description" class="form-label">
+                <i class="bi bi-text-paragraph"></i>
+                Description
+              </label>
               <textarea
                 class="form-control"
                 id="description"
                 name="description"
                 rows="3"
+                placeholder="Enter product description..."
               ></textarea>
             </div>
 
             <div class="col-md-6">
-              <label for="category_id" class="form-label">Category</label>
+              <label for="category_id" class="form-label">
+                <i class="bi bi-folder"></i>
+                Category
+              </label>
               <select class="form-select" id="category_id" name="category_id">
                 <option value="">Select Category</option>
                 {% for category in categories %}
@@ -67,7 +94,10 @@ Management{% endblock %} {% block breadcrumb %}
             </div>
 
             <div class="col-md-6">
-              <label for="unit" class="form-label">Unit of Measure</label>
+              <label for="unit" class="form-label">
+                <i class="bi bi-rulers"></i>
+                Unit of Measure
+              </label>
               <select class="form-select" id="unit" name="unit">
                 <option value="pcs">Pieces (pcs)</option>
                 <option value="kg">Kilograms (kg)</option>
@@ -79,9 +109,10 @@ Management{% endblock %} {% block breadcrumb %}
             </div>
 
             <div class="col-md-6">
-              <label for="reorder_level" class="form-label"
-                >Reorder Level</label
-              >
+              <label for="reorder_level" class="form-label">
+                <i class="bi bi-exclamation-triangle"></i>
+                Reorder Level
+              </label>
               <input
                 type="number"
                 class="form-control"
@@ -89,14 +120,16 @@ Management{% endblock %} {% block breadcrumb %}
                 name="reorder_level"
                 value="0"
                 min="0"
+                step="1"
               />
               <div class="form-text">Minimum stock level before alert</div>
             </div>
 
             <div class="col-md-6">
-              <label for="warehouse_id" class="form-label"
-                >Warehouse (for initial stock)</label
-              >
+              <label for="warehouse_id" class="form-label">
+                <i class="bi bi-building"></i>
+                Warehouse (for initial stock)
+              </label>
               <select class="form-select" id="warehouse_id" name="warehouse_id">
                 <option value="">Skip initial stock</option>
                 {% for warehouse in warehouses %}
@@ -111,9 +144,10 @@ Management{% endblock %} {% block breadcrumb %}
             </div>
 
             <div class="col-md-6">
-              <label for="initial_stock" class="form-label"
-                >Initial Stock Quantity</label
-              >
+              <label for="initial_stock" class="form-label">
+                <i class="bi bi-stack"></i>
+                Initial Stock Quantity
+              </label>
               <input
                 type="number"
                 class="form-control"
@@ -122,6 +156,7 @@ Management{% endblock %} {% block breadcrumb %}
                 value="0"
                 min="0"
                 step="0.01"
+                placeholder="0.00"
               />
               <div class="form-text">Only used if warehouse is selected</div>
             </div>
@@ -135,21 +170,28 @@ Management{% endblock %} {% block breadcrumb %}
                   name="is_active"
                   checked
                 />
-                <label class="form-check-label" for="is_active"
-                  >Active Product</label
-                >
+                <label class="form-check-label" for="is_active">
+                  <i class="bi bi-check-circle"></i>
+                  Active Product
+                </label>
               </div>
             </div>
 
-            <div class="col-12 mt-4 d-flex justify-content-end gap-2">
-              <a
-                href="{{ url_for('products.list_products') }}"
-                class="btn btn-outline-secondary"
-                >Cancel</a
-              >
-              <button type="submit" class="btn btn-primary">
-                Create Product
-              </button>
+            <div class="col-12">
+              <hr class="my-4" />
+              <div class="d-flex gap-2 justify-content-end">
+                <a
+                  href="{{ url_for('products.list_products') }}"
+                  class="btn btn-outline-secondary"
+                >
+                  <i class="bi bi-x-circle"></i>
+                  Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-check-circle"></i>
+                  Create Product
+                </button>
+              </div>
             </div>
           </div>
         </form>
@@ -157,4 +199,38 @@ Management{% endblock %} {% block breadcrumb %}
     </div>
   </div>
 </div>
+
+<script>
+  // Form validation
+  (function () {
+    "use strict";
+    const forms = document.querySelectorAll(".needs-validation");
+    Array.from(forms).forEach((form) => {
+      form.addEventListener(
+        "submit",
+        (event) => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add("was-validated");
+        },
+        false
+      );
+    });
+  })();
+
+  // Enable/disable initial stock based on warehouse selection
+  const warehouseSelect = document.getElementById("warehouse_id");
+  const initialStockInput = document.getElementById("initial_stock");
+
+  warehouseSelect.addEventListener("change", function () {
+    if (this.value) {
+      initialStockInput.removeAttribute("disabled");
+      initialStockInput.focus();
+    } else {
+      initialStockInput.value = "0";
+    }
+  });
+</script>
 {% endblock %}

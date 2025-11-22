@@ -514,7 +514,28 @@
 }
 
 /* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
+
+/* Sidebar Overlay for Mobile */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sidebar-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Mobile Navigation Improvements */
+@media (max-width: 991.98px) {
   .sidebar {
     transform: translateX(-100%);
   }
@@ -523,25 +544,82 @@
     transform: translateX(0);
   }
 
-  .main-content {
-    margin-left: 0;
+  .sidebar-toggle {
+    display: block !important;
   }
 
-  .menu-toggle,
-  .sidebar-toggle {
+  .main-content {
+    margin-left: 0 !important;
+  }
+
+  .app-container {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .menu-toggle {
     display: block;
   }
 
-  .search-input {
+  .search-box .search-input {
     width: 200px;
   }
 
-  .search-input:focus {
+  .search-box .search-input:focus {
     width: 250px;
   }
 
   .user-name-small {
-    display: none;
+    display: none !important;
+  }
+
+  .topbar-left .breadcrumb {
+    font-size: 0.875rem;
+  }
+
+  /* Stack cards on mobile */
+  .row > [class*="col-"] {
+    margin-bottom: 1rem;
+  }
+
+  /* Responsive tables */
+  .table-responsive {
+    border: 0;
+  }
+
+  .table-responsive table {
+    font-size: 0.875rem;
+  }
+
+  /* Adjust page header for mobile */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+
+  .page-actions {
+    width: 100%;
+  }
+
+  .page-actions .btn {
+    width: 100%;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .sidebar {
+    width: 220px;
+  }
+
+  .main-content {
+    margin-left: 220px;
+  }
+
+  .nav-text {
+    font-size: 0.875rem;
   }
 }
 /* ===== DASHBOARD ENHANCEMENTS ===== */

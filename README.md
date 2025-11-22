@@ -2,6 +2,28 @@
 
 A comprehensive, modular Flask-based inventory management system with MongoDB, following strict PEP8 standards and clean architecture principles.
 
+## 🎉 Recent Improvements
+
+### ✅ Database Architecture Enhancements
+
+- **Migration System**: Complete versioning strategy with rollback support
+- **Index Optimization**: Comprehensive indexing via migration system
+- **ObjectId Serialization**: Centralized utilities for consistent data handling
+- **Security**: Environment-based configuration, no hard-coded credentials
+
+📖 See [DATABASE_IMPROVEMENTS.md](DATABASE_IMPROVEMENTS.md) for details
+
+### ✅ UI/UX Enhancements
+
+- **Accessibility**: WCAG 2.1 Level AA compliant, screen reader support
+- **Responsive Design**: Mobile-first approach with optimized layouts
+- **Design System**: 150+ utility classes, consistent theming
+- **Performance**: Optimized CSS/JS, smooth transitions
+
+📖 See [UI_UX_IMPROVEMENTS.md](UI_UX_IMPROVEMENTS.md) for details
+
+---
+
 ## Features
 
 ### Core Functionality
@@ -135,11 +157,32 @@ src/
 4. **Configure environment**
 
    ```bash
+   # Windows
    copy .env.example .env
+
+   # Linux/Mac
+   cp .env.example .env
+
    # Edit .env with your MongoDB connection string and secrets
    ```
 
-5. **Run the application**
+   **⚠️ Important**: The application will NOT start without these required environment variables:
+
+   - `MONGODB_URI` - Your MongoDB connection string
+   - `SECRET_KEY` - Flask secret key (min 32 characters)
+   - `JWT_SECRET_KEY` - JWT secret key (min 32 characters)
+
+5. **Run database migrations**
+
+   ```bash
+   # Check migration status
+   python migrate.py status
+
+   # Apply all migrations
+   python migrate.py up
+   ```
+
+6. **Run the application**
 
    ```bash
    # Development
@@ -151,14 +194,14 @@ src/
    flask run
    ```
 
-6. **Access the application**
+7. **Access the application**
    ```
    http://localhost:5000
    ```
 
 ## Configuration
 
-Edit `.env` file:
+Edit `.env` file (see `.env.example` for template):
 
 ```env
 # Flask Configuration

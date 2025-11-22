@@ -17,16 +17,25 @@ class Config:
     """Base configuration class with common settings."""
 
     # Flask settings
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    if not SECRET_KEY:
+        raise ValueError("SECRET_KEY environment variable must be set")
+    
     DEBUG = False
     TESTING = False
 
     # MongoDB settings
-    MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb+srv://sachinchaurasiya69:606280Sk@tesing.8vhz1.mongodb.net/odoo')
+    MONGODB_URI = os.getenv('MONGODB_URI')
+    if not MONGODB_URI:
+        raise ValueError("MONGODB_URI environment variable must be set")
+    
     MONGODB_DB_NAME = os.getenv('MONGODB_DB_NAME', 'inventory_management')
 
     # JWT settings
-    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+    if not JWT_SECRET_KEY:
+        raise ValueError("JWT_SECRET_KEY environment variable must be set")
+    
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(
         seconds=int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES', 3600))
     )
@@ -54,10 +63,33 @@ class Config:
     OTP_EXPIRY_MINUTES = int(os.getenv('OTP_EXPIRY_MINUTES', 10))
     OTP_LENGTH = 6
 
-    # Session settings
+    # Session settings (Redis-backed for horizontal scaling)
+    SESSION_TYPE = os.getenv('SESSION_TYPE', 'redis')  # 'redis' for production, 'filesystem' for dev
+    SESSION_PERMANENT = False
+    SESSION_USE_SIGNER = True
+    SESSION_KEY_PREFIX = 'inventory:session:'
+    
+    # Redis settings for sessions and caching
+    REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+    SESSION_REDIS = None  # Will be set in app factory
+    
+    # Session cookie settings
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_NAME = 'inventory_session'
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
+    
+    # MongoDB async settings
+    MONGODB_MAX_POOL_SIZE = int(os.getenv('MONGODB_MAX_POOL_SIZE', 100))
+    MONGODB_MIN_POOL_SIZE = int(os.getenv('MONGODB_MIN_POOL_SIZE', 10))
+    MONGODB_SERVER_SELECTION_TIMEOUT_MS = int(os.getenv('MONGODB_TIMEOUT_MS', 5000))
+    MONGODB_CONNECT_TIMEOUT_MS = int(os.getenv('MONGODB_CONNECT_TIMEOUT_MS', 10000))
+    MONGODB_SOCKET_TIMEOUT_MS = int(os.getenv('MONGODB_SOCKET_TIMEOUT_MS', 20000))
+    
+    # Application performance settings
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max upload
+    SEND_FILE_MAX_AGE_DEFAULT = timedelta(hours=12)
 
 
 class DevelopmentConfig(Config):
@@ -65,6 +97,8 @@ class DevelopmentConfig(Config):
 
     DEBUG = True
     SESSION_COOKIE_SECURE = False
+    SESSION_TYPE = 'filesystem'  # Use filesystem for local dev (no Redis required)
+    SESSION_FILE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.flask_session')
 
 
 class ProductionConfig(Config):

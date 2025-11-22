@@ -7,6 +7,7 @@ This module defines routes for Product and category management.
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from utils.decorators import login_required, role_required
 from utils.responses import success_response, error_response
+from utils.constants import ROLE_ADMIN, ROLE_INVENTORY_MANAGER, ROLE_WAREHOUSE_STAFF
 from config.database import get_db
 from models.product import Product
 from bson import ObjectId
@@ -23,17 +24,74 @@ def list_products():
     """List all products."""
     try:
         db = get_db()
-        products = list(db.products.find({'is_active': True}))
-        # Enrich with category names if needed, or do it in aggregation
-        # For now, simple list
-        return render_template('products/list.html', products=products)
+        
+        # Get search and filter parameters
+        search = request.args.get('search', '')
+        category_filter = request.args.get('category', '')
+        status_filter = request.args.get('status', '')
+        
+        # Build query
+        query = {}
+        if status_filter == 'active':
+            query['is_active'] = True
+        elif status_filter == 'inactive':
+            query['is_active'] = False
+        
+        if category_filter:
+            query['category_id'] = ObjectId(category_filter)
+        
+        if search:
+            query['$or'] = [
+                {'sku': {'$regex': search, '$options': 'i'}},
+                {'name': {'$regex': search, '$options': 'i'}}
+            ]
+        
+        # Get products with aggregation to include category names and stock
+        pipeline = [
+            {'$match': query},
+            {
+                '$lookup': {
+                    'from': 'categories',
+                    'localField': 'category_id',
+                    'foreignField': '_id',
+                    'as': 'category'
+                }
+            },
+            {
+                '$lookup': {
+                    'from': 'stock_levels',
+                    'localField': '_id',
+                    'foreignField': 'product_id',
+                    'as': 'stock'
+                }
+            },
+            {
+                '$addFields': {
+                    'category_name': {'$arrayElemAt': ['$category.name', 0]},
+                    'total_stock': {
+                        '$reduce': {
+                            'input': '$stock',
+                            'initialValue': 0,
+                            'in': {'$add': ['$$value', '$$this.quantity']}
+                        }
+                    }
+                }
+            },
+            {'$sort': {'created_at': -1}}
+        ]
+        
+        products = list(db.products.aggregate(pipeline))
+        categories = list(db.categories.find())
+        
+        return render_template('products/list.html', products=products, categories=categories)
     except Exception as e:
         logger.error(f"Error listing products: {e}")
         flash("Error loading products", "danger")
-        return render_template('products/list.html', products=[])
+        return render_template('products/list.html', products=[], categories=[])
 
 @products_bp.route('/create', methods=['GET', 'POST'])
 @login_required
+@role_required(ROLE_ADMIN, ROLE_INVENTORY_MANAGER, ROLE_WAREHOUSE_STAFF)
 def create_product():
     """Create a new product."""
     db = get_db()
@@ -45,7 +103,7 @@ def create_product():
             description = request.form.get('description')
             category_id = request.form.get('category_id')
             unit = request.form.get('unit')
-            reorder_level = int(request.form.get('reorder_level', 0))
+            reorder_level = int(float(request.form.get('reorder_level', 0)))
             is_active = request.form.get('is_active') == 'on'
             warehouse_id = request.form.get('warehouse_id')
             initial_stock = float(request.form.get('initial_stock', 0))
@@ -189,6 +247,7 @@ def view_product(product_id):
 
 @products_bp.route('/<product_id>/edit', methods=['GET', 'POST'])
 @login_required
+@role_required(ROLE_ADMIN, ROLE_INVENTORY_MANAGER, ROLE_WAREHOUSE_STAFF)
 def update_product(product_id):
     """Update product."""
     try:
@@ -250,6 +309,7 @@ def update_product(product_id):
 
 @products_bp.route('/<product_id>/delete', methods=['POST'])
 @login_required
+@role_required(ROLE_ADMIN, ROLE_INVENTORY_MANAGER)
 def delete_product(product_id):
     """Delete product."""
     try:

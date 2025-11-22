@@ -84,6 +84,7 @@ def register():
     password = request.form.get('password', '')
     confirm_password = request.form.get('confirm_password', '')
     full_name = request.form.get('full_name', '').strip()
+    role = request.form.get('role', 'viewer').strip()
 
     # Validation
     if not all([username, email, password, confirm_password]):
@@ -100,7 +101,7 @@ def register():
             email=email,
             password=password,
             full_name=full_name,
-            role='viewer'  # Default role for new registrations
+            role=role
         )
 
         flash('Registration successful! Please log in.', 'success')

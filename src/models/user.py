@@ -10,6 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from bson import ObjectId
 
 from utils.constants import VALID_ROLES, ROLE_VIEWER
+from utils.serializers import serialize_object_id, serialize_datetime
 
 
 class User:
@@ -106,14 +107,14 @@ class User:
             dict: User data as dictionary.
         """
         data = {
-            '_id': str(self._id),
+            '_id': serialize_object_id(self._id),
             'username': self.username,
             'email': self.email,
             'full_name': self.full_name,
             'role': self.role,
             'is_active': self.is_active,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            'created_at': serialize_datetime(self.created_at),
+            'updated_at': serialize_datetime(self.updated_at)
         }
         
         if include_sensitive:

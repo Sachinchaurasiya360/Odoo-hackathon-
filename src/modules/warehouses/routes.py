@@ -7,6 +7,7 @@ This module defines routes for Warehouse management.
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from utils.decorators import login_required, role_required
 from utils.responses import success_response, error_response
+from utils.constants import ROLE_ADMIN, ROLE_INVENTORY_MANAGER
 from config.database import get_db
 from models.warehouse import Warehouse
 import logging
@@ -30,6 +31,7 @@ def list_warehouses():
 
 @warehouses_bp.route('/create', methods=['GET', 'POST'])
 @login_required
+@role_required(ROLE_ADMIN, ROLE_INVENTORY_MANAGER)
 def create_warehouse():
     """Create a new warehouse."""
     if request.method == 'POST':

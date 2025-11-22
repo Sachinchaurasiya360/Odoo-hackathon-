@@ -12,6 +12,7 @@ from utils.constants import (
     ADJUSTMENT_STATUSES, ADJUSTMENT_STATUS_DRAFT, ADJUSTMENT_STATUS_FLOW,
     ADJUSTMENT_TYPES, ADJUSTMENT_TYPE_PHYSICAL_COUNT
 )
+from utils.serializers import serialize_object_id, serialize_datetime
 
 
 class Adjustment:
@@ -90,22 +91,22 @@ class Adjustment:
             dict: Adjustment data as dictionary.
         """
         return {
-            '_id': str(self._id),
+            '_id': serialize_object_id(self._id),
             'adjustment_number': self.adjustment_number,
-            'warehouse_id': str(self.warehouse_id),
-            'product_id': str(self.product_id),
+            'warehouse_id': serialize_object_id(self.warehouse_id),
+            'product_id': serialize_object_id(self.product_id),
             'adjustment_type': self.adjustment_type,
             'status': self.status,
-            'adjustment_date': self.adjustment_date.isoformat() if self.adjustment_date else None,
+            'adjustment_date': serialize_datetime(self.adjustment_date),
             'system_quantity': self.system_quantity,
             'physical_quantity': self.physical_quantity,
             'difference': self.difference,
             'reason': self.reason,
             'notes': self.notes,
-            'created_by': str(self.created_by) if self.created_by else None,
-            'approved_by': str(self.approved_by) if self.approved_by else None,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            'created_by': serialize_object_id(self.created_by),
+            'approved_by': serialize_object_id(self.approved_by),
+            'created_at': serialize_datetime(self.created_at),
+            'updated_at': serialize_datetime(self.updated_at)
         }
 
     def to_mongo(self):

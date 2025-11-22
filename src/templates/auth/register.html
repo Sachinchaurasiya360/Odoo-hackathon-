@@ -1,90 +1,258 @@
-{% extends "base.html" %}
-
-{% block title %}Register - Inventory Management System{% endblock %}
-
-{% block content %}
-<div class="container">
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <i class="bi bi-person-plus" style="font-size: 3rem; color: #0d6efd;"></i>
-                        <h2 class="mt-3">Create Account</h2>
-                        <p class="text-muted">Join the Inventory System</p>
-                    </div>
-
-                    <form method="POST" action="{{ url_for('auth.register') }}" class="needs-validation" novalidate>
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username"
-                                pattern="[a-zA-Z0-9_]{3,30}" required autofocus>
-                            <div class="invalid-feedback">
-                                Username must be 3-30 characters (letters, numbers, underscores only)
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                            <div class="invalid-feedback">
-                                Please provide a valid email address
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="full_name" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="full_name" name="full_name">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" minlength="8"
-                                required>
-                            <div class="invalid-feedback">
-                                Password must be at least 8 characters
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="confirm_password" class="form-label">Confirm Password</label>
-                            <input type="password" class="form-control" id="confirm_password" name="confirm_password"
-                                minlength="8" required>
-                            <div class="invalid-feedback">
-                                Passwords must match
-                            </div>
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-person-check"></i> Create Account
-                            </button>
-                        </div>
-                    </form>
-
-                    <div class="text-center mt-4">
-                        <p class="text-muted">
-                            Already have an account?
-                            <a href="{{ url_for('auth.login') }}">Sign in here</a>
-                        </p>
-                    </div>
-                </div>
+{% extends "base.html" %} {% block title %}Register - Inventory Management
+System{% endblock %} {% block meta_description %}Create your Inventory
+Management System account to start managing products, warehouses, and inventory
+operations{% endblock %} {% block content %}
+<div class="container py-4 py-md-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+      <article class="card shadow-lg border-0 hover-lift">
+        <div class="card-body p-4 p-md-5">
+          <!-- Header -->
+          <header class="text-center mb-4">
+            <div class="mb-3" role="img" aria-label="Create account icon">
+              <i
+                class="bi bi-person-plus"
+                style="font-size: 3rem; color: var(--primary-color)"
+                aria-hidden="true"
+              ></i>
             </div>
+            <h1 class="h2 mb-2">Create Account</h1>
+            <p class="text-muted mb-0">Join the Inventory System</p>
+          </header>
+
+          <!-- Registration Form -->
+          <form
+            method="POST"
+            action="{{ url_for('auth.register') }}"
+            class="needs-validation"
+            novalidate
+            aria-label="Registration form"
+          >
+            <div class="row g-3">
+              <!-- Username -->
+              <div class="col-md-6">
+                <label for="username" class="form-label">
+                  <i class="bi bi-person" aria-hidden="true"></i>
+                  Username
+                  <span class="text-danger" aria-label="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="username"
+                  name="username"
+                  pattern="[a-zA-Z0-9_]{3,30}"
+                  autocomplete="username"
+                  placeholder="Choose a username"
+                  required
+                  autofocus
+                  aria-required="true"
+                  aria-describedby="usernameHelp"
+                />
+                <div class="invalid-feedback" id="usernameHelp">
+                  Username must be 3-30 characters (letters, numbers,
+                  underscores only)
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div class="col-md-6">
+                <label for="email" class="form-label">
+                  <i class="bi bi-envelope" aria-hidden="true"></i>
+                  Email
+                  <span class="text-danger" aria-label="required">*</span>
+                </label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                  autocomplete="email"
+                  placeholder="your@email.com"
+                  required
+                  aria-required="true"
+                  aria-describedby="emailHelp"
+                />
+                <div class="invalid-feedback" id="emailHelp">
+                  Please provide a valid email address
+                </div>
+              </div>
+
+              <!-- Full Name -->
+              <div class="col-12">
+                <label for="full_name" class="form-label">
+                  <i class="bi bi-person-badge" aria-hidden="true"></i>
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="full_name"
+                  name="full_name"
+                  autocomplete="name"
+                  placeholder="Enter your full name"
+                  aria-describedby="fullNameHelp"
+                />
+                <div class="form-text" id="fullNameHelp">
+                  Optional - helps personalize your experience
+                </div>
+              </div>
+
+              <!-- Role -->
+              <div class="col-12">
+                <label for="role" class="form-label">
+                  <i class="bi bi-shield-check" aria-hidden="true"></i>
+                  Role
+                  <span class="text-danger" aria-label="required">*</span>
+                </label>
+                <select
+                  class="form-select"
+                  id="role"
+                  name="role"
+                  required
+                  aria-required="true"
+                  aria-describedby="roleHelp"
+                >
+                  <option value="viewer" selected>
+                    Viewer - View only access
+                  </option>
+                  <option value="warehouse_staff">
+                    Warehouse Staff - Basic operations
+                  </option>
+                  <option value="inventory_manager">
+                    Inventory Manager - Full inventory control
+                  </option>
+                  <option value="admin">Admin - Full system access</option>
+                </select>
+                <div class="form-text" id="roleHelp">
+                  Select your role based on your responsibilities in the system
+                </div>
+              </div>
+
+              <!-- Password -->
+              <div class="col-md-6">
+                <label for="password" class="form-label">
+                  <i class="bi bi-lock" aria-hidden="true"></i>
+                  Password
+                  <span class="text-danger" aria-label="required">*</span>
+                </label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  name="password"
+                  autocomplete="new-password"
+                  minlength="8"
+                  placeholder="Minimum 8 characters"
+                  required
+                  aria-required="true"
+                  aria-describedby="passwordHelp"
+                />
+                <div class="invalid-feedback" id="passwordHelp">
+                  Password must be at least 8 characters
+                </div>
+              </div>
+
+              <!-- Confirm Password -->
+              <div class="col-md-6">
+                <label for="confirm_password" class="form-label">
+                  <i class="bi bi-lock-fill" aria-hidden="true"></i>
+                  Confirm Password
+                  <span class="text-danger" aria-label="required">*</span>
+                </label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="confirm_password"
+                  name="confirm_password"
+                  autocomplete="new-password"
+                  minlength="8"
+                  placeholder="Re-enter password"
+                  required
+                  aria-required="true"
+                  aria-describedby="confirmPasswordHelp"
+                />
+                <div class="invalid-feedback" id="confirmPasswordHelp">
+                  Passwords must match
+                </div>
+              </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg"
+                aria-label="Create new account"
+              >
+                <i class="bi bi-person-check" aria-hidden="true"></i>
+                <span>Create Account</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Footer -->
+          <footer class="text-center mt-4 pt-3 border-top">
+            <p class="text-muted mb-0">
+              Already have an account?
+              <a
+                href="{{ url_for('auth.login') }}"
+                class="fw-semibold text-decoration-none"
+                >Sign in here</a
+              >
+            </p>
+          </footer>
         </div>
+      </article>
     </div>
+  </div>
 </div>
 
+{% endblock %} {% block extra_js %}
 <script>
-    // Password confirmation validation
-    document.getElementById('confirm_password').addEventListener('input', function () {
-        const password = document.getElementById('password').value;
-        const confirm = this.value;
+  (function () {
+    "use strict";
 
-        if (password !== confirm) {
-            this.setCustomValidity('Passwords must match');
-        } else {
-            this.setCustomValidity('');
-        }
+    // Form validation
+    const forms = document.querySelectorAll(".needs-validation");
+    Array.from(forms).forEach((form) => {
+      form.addEventListener(
+        "submit",
+        (event) => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add("was-validated");
+        },
+        false
+      );
     });
+
+    // Password confirmation validation
+    const confirmPasswordInput = document.getElementById("confirm_password");
+    const passwordInput = document.getElementById("password");
+
+    if (confirmPasswordInput && passwordInput) {
+      confirmPasswordInput.addEventListener("input", function () {
+        if (passwordInput.value !== this.value) {
+          this.setCustomValidity("Passwords must match");
+        } else {
+          this.setCustomValidity("");
+        }
+      });
+
+      // Also check when password changes
+      passwordInput.addEventListener("input", function () {
+        if (
+          confirmPasswordInput.value &&
+          this.value !== confirmPasswordInput.value
+        ) {
+          confirmPasswordInput.setCustomValidity("Passwords must match");
+        } else {
+          confirmPasswordInput.setCustomValidity("");
+        }
+      });
+    }
+  })();
 </script>
 {% endblock %}

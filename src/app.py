@@ -9,6 +9,7 @@ from flask import Flask, render_template, session
 from config.settings import get_config
 from config.database import db
 import logging
+import os
 
 # Configure logging
 logging.basicConfig(
@@ -35,8 +36,19 @@ def create_app(config_name=None):
     config = get_config(config_name)
     app.config.from_object(config)
 
-    # Initialize database
-    db.initialize(app.config['MONGODB_URI'], app.config['MONGODB_DB_NAME'])
+    # Initialize session storage (Redis for production, filesystem for dev)
+    init_session_storage(app)
+
+    # Initialize database with connection pooling
+    db.initialize(
+        app.config['MONGODB_URI'], 
+        app.config['MONGODB_DB_NAME'],
+        max_pool_size=app.config.get('MONGODB_MAX_POOL_SIZE', 100),
+        min_pool_size=app.config.get('MONGODB_MIN_POOL_SIZE', 10),
+        server_selection_timeout_ms=app.config.get('MONGODB_SERVER_SELECTION_TIMEOUT_MS', 5000),
+        connect_timeout_ms=app.config.get('MONGODB_CONNECT_TIMEOUT_MS', 10000),
+        socket_timeout_ms=app.config.get('MONGODB_SOCKET_TIMEOUT_MS', 20000)
+    )
 
     # Register blueprints
     register_blueprints(app)
@@ -50,6 +62,75 @@ def create_app(config_name=None):
     logger.info(f"Application created with config: {config_name or 'default'}")
 
     return app
+
+
+def init_session_storage(app):
+    """
+    Initialize session storage based on configuration.
+    Uses Redis for production (horizontal scaling) or filesystem for development.
+
+    Args:
+        app (Flask): Flask application instance.
+    """
+    session_type = app.config.get('SESSION_TYPE', 'filesystem')
+    
+    if session_type == 'redis':
+        try:
+            import redis
+            from flask_session import Session
+            
+            # Configure Redis connection
+            redis_url = app.config.get('REDIS_URL', 'redis://localhost:6379/0')
+            app.config['SESSION_REDIS'] = redis.from_url(
+                redis_url,
+                decode_responses=False,
+                socket_connect_timeout=5,
+                socket_timeout=5,
+                retry_on_timeout=True,
+                health_check_interval=30
+            )
+            
+            # Initialize Flask-Session
+            Session(app)
+            logger.info(f"Redis session storage initialized: {redis_url}")
+            
+        except ImportError:
+            logger.warning("redis or flask-session not installed. Falling back to filesystem sessions.")
+            logger.warning("Install with: pip install redis flask-session")
+            app.config['SESSION_TYPE'] = 'filesystem'
+            init_filesystem_session(app)
+        except Exception as e:
+            logger.error(f"Failed to connect to Redis: {e}")
+            logger.warning("Falling back to filesystem sessions")
+            app.config['SESSION_TYPE'] = 'filesystem'
+            init_filesystem_session(app)
+    else:
+        init_filesystem_session(app)
+
+
+def init_filesystem_session(app):
+    """
+    Initialize filesystem-based session storage (for development only).
+    
+    Args:
+        app (Flask): Flask application instance.
+    """
+    try:
+        from flask_session import Session
+        
+        # Create session directory if it doesn't exist
+        session_dir = app.config.get('SESSION_FILE_DIR', 
+                                     os.path.join(os.path.dirname(__file__), '.flask_session'))
+        os.makedirs(session_dir, exist_ok=True)
+        
+        Session(app)
+        logger.info(f"Filesystem session storage initialized: {session_dir}")
+        logger.warning("Using filesystem sessions - not recommended for production!")
+        
+    except ImportError:
+        logger.warning("flask-session not installed. Using default Flask sessions (server memory).")
+        logger.warning("Install with: pip install flask-session")
+        logger.warning("NOTE: Default sessions do not support horizontal scaling!")
 
 
 def register_blueprints(app):

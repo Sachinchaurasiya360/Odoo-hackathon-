@@ -7,6 +7,8 @@ This module defines the Warehouse model for managing warehouse locations.
 from datetime import datetime
 from bson import ObjectId
 
+from utils.serializers import serialize_object_id, serialize_datetime
+
 
 class Warehouse:
     """Warehouse model for managing warehouse locations."""
@@ -41,13 +43,13 @@ class Warehouse:
             dict: Warehouse data as dictionary.
         """
         return {
-            '_id': str(self._id),
+            '_id': serialize_object_id(self._id),
             'code': self.code,
             'name': self.name,
             'location': self.location,
             'is_active': self.is_active,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            'created_at': serialize_datetime(self.created_at),
+            'updated_at': serialize_datetime(self.updated_at)
         }
 
     def to_mongo(self):

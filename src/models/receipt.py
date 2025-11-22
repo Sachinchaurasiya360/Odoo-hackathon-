@@ -11,6 +11,7 @@ from bson import ObjectId
 from utils.constants import (
     RECEIPT_STATUSES, RECEIPT_STATUS_DRAFT, RECEIPT_STATUS_FLOW
 )
+from utils.serializers import serialize_object_id, serialize_datetime
 
 
 class ReceiptItem:
@@ -39,7 +40,7 @@ class ReceiptItem:
     def to_dict(self):
         """Convert to dictionary."""
         return {
-            'product_id': str(self.product_id),
+            'product_id': serialize_object_id(self.product_id),
             'expected_quantity': self.expected_quantity,
             'received_quantity': self.received_quantity,
             'damaged_quantity': self.damaged_quantity,
@@ -140,23 +141,23 @@ class Receipt:
     def to_dict(self):
         """Convert receipt to dictionary."""
         return {
-            '_id': str(self._id),
+            '_id': serialize_object_id(self._id),
             'receipt_number': self.receipt_number,
-            'warehouse_id': str(self.warehouse_id),
+            'warehouse_id': serialize_object_id(self.warehouse_id),
             'supplier_name': self.supplier_name,
             'status': self.status,
-            'scheduled_date': self.scheduled_date.isoformat() if self.scheduled_date else None,
-            'received_date': self.received_date.isoformat() if self.received_date else None,
+            'scheduled_date': serialize_datetime(self.scheduled_date),
+            'received_date': serialize_datetime(self.received_date),
             'items': [item.to_dict() for item in self.items],
             'notes': self.notes,
-            'created_by': str(self.created_by) if self.created_by else None,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'created_by': serialize_object_id(self.created_by),
+            'created_at': serialize_datetime(self.created_at),
+            'updated_at': serialize_datetime(self.updated_at),
             'status_history': [
                 {
                     'status': h['status'],
-                    'changed_at': h['changed_at'].isoformat() if isinstance(h['changed_at'], datetime) else h['changed_at'],
-                    'changed_by': str(h['changed_by'])
+                    'changed_at': serialize_datetime(h['changed_at']),
+                    'changed_by': serialize_object_id(h['changed_by'])
                 }
                 for h in self.status_history
             ]

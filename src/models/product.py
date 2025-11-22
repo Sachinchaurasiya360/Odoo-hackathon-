@@ -9,6 +9,7 @@ from datetime import datetime
 from bson import ObjectId
 
 from utils.constants import VALID_UNITS, UNIT_PIECES
+from utils.serializers import serialize_object_id, serialize_datetime
 
 
 class Category:
@@ -40,11 +41,11 @@ class Category:
             dict: Category data as dictionary.
         """
         return {
-            '_id': str(self._id),
+            '_id': serialize_object_id(self._id),
             'name': self.name,
             'description': self.description,
-            'parent_id': str(self.parent_id) if self.parent_id else None,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'parent_id': serialize_object_id(self.parent_id),
+            'created_at': serialize_datetime(self.created_at)
         }
 
     def to_mongo(self):
@@ -129,16 +130,16 @@ class Product:
             dict: Product data as dictionary.
         """
         return {
-            '_id': str(self._id),
+            '_id': serialize_object_id(self._id),
             'sku': self.sku,
             'name': self.name,
             'description': self.description,
-            'category_id': str(self.category_id) if self.category_id else None,
+            'category_id': serialize_object_id(self.category_id),
             'unit': self.unit,
             'reorder_level': self.reorder_level,
             'is_active': self.is_active,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            'created_at': serialize_datetime(self.created_at),
+            'updated_at': serialize_datetime(self.updated_at)
         }
 
     def to_mongo(self):

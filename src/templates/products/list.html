@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% from "components/table.html" import render_table, render_pagination %}
 
 {% block title %}Products - Inventory Management{% endblock %}
 
@@ -10,36 +9,45 @@
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
+<div class="page-header animate-fade-in">
     <div class="page-header-content">
         <h1 class="page-title">
-            <i class="bi bi-box-seam"></i>
+            <i class="bi bi-box-seam-fill"></i>
             Products
         </h1>
         <p class="page-description">Manage your product catalog and inventory</p>
     </div>
     <div class="page-actions">
         <a href="{{ url_for('products.create_product') }}" class="btn btn-primary">
-            <i class="bi bi-plus-lg"></i>
+            <i class="bi bi-plus-circle-fill"></i>
             Add Product
         </a>
     </div>
 </div>
 
 <!-- Filters -->
-<div class="card mb-4">
+<div class="card mb-4 hover-lift">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="bi bi-funnel-fill"></i>
+            Filter Products
+        </h6>
+    </div>
     <div class="card-body">
         <form method="GET" class="row g-3">
             <div class="col-md-4">
-                <label for="search" class="form-label">Search</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control" id="search" name="search"
-                        placeholder="Search by name or SKU..." value="{{ request.args.get('search', '') }}">
-                </div>
+                <label for="search" class="form-label">
+                    <i class="bi bi-search"></i>
+                    Search
+                </label>
+                <input type="text" class="form-control" id="search" name="search"
+                    placeholder="Search by name or SKU..." value="{{ request.args.get('search', '') }}">
             </div>
             <div class="col-md-3">
-                <label for="category" class="form-label">Category</label>
+                <label for="category" class="form-label">
+                    <i class="bi bi-folder"></i>
+                    Category
+                </label>
                 <select class="form-select" id="category" name="category">
                     <option value="">All Categories</option>
                     {% for category in categories %}
@@ -51,7 +59,10 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <label for="status" class="form-label">Status</label>
+                <label for="status" class="form-label">
+                    <i class="bi bi-toggle-on"></i>
+                    Status
+                </label>
                 <select class="form-select" id="status" name="status">
                     <option value="">All</option>
                     <option value="active" {% if request.args.get('status')=='active' %}selected{% endif %}>Active
@@ -61,11 +72,13 @@
                 </select>
             </div>
             <div class="col-md-3 d-flex align-items-end">
-                <button type="submit" class="btn btn-secondary me-2">
-                    <i class="bi bi-funnel"></i> Filter
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="bi bi-search"></i>
+                    Filter
                 </button>
                 <a href="{{ url_for('products.list_products') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-x-lg"></i> Clear
+                    <i class="bi bi-x-circle"></i>
+                    Clear
                 </a>
             </div>
         </form>
@@ -73,91 +86,93 @@
 </div>
 
 <!-- Products Table -->
-<div class="card">
+<div class="card hover-lift">
     <div class="card-header">
-        <h5 class="card-title mb-0">Product List</h5>
+        <h5 class="card-title mb-0">
+            <i class="bi bi-table"></i>
+            Product List
+        </h5>
     </div>
-    {% call render_table(['SKU', 'Name', 'Category', 'Unit', 'Total Stock', 'Reorder Level', 'Status'], products,
-    actions=True, selectable=True) %}
-    {% for product in products %}
-    <tr>
-        <td>
-            <input type="checkbox" class="form-check-input" value="{{ product._id }}">
-        </td>
-        <td>
-            <span class="badge bg-secondary">{{ product.sku }}</span>
-        </td>
-        <td>
-            <a href="{{ url_for('products.view_product', product_id=product._id) }}"
-                class="fw-semibold text-decoration-none">
-                {{ product.name }}
+    <div class="card-body p-0">
+        {% if products %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th width="5%">
+                            <input type="checkbox" class="form-check-input" id="selectAll">
+                        </th>
+                        <th>SKU</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Unit</th>
+                        <th class="text-end">Total Stock</th>
+                        <th class="text-end">Reorder Level</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr class="animate-fade-in">
+                        <td>
+                            <input type="checkbox" class="form-check-input" value="{{ product._id }}">
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ product.sku }}</span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('products.view_product', product_id=product._id) }}"
+                                class="fw-semibold text-decoration-none">
+                                {{ product.name }}
+                            </a>
+                        </td>
+                        <td>{{ product.category_name or '-' }}</td>
+                        <td>{{ product.unit }}</td>
+                        <td class="text-end">
+                            <span class="{% if product.total_stock|default(0) < product.reorder_level %}text-danger fw-bold{% endif %}">
+                                {{ product.total_stock|default(0)|int }}
+                            </span>
+                        </td>
+                        <td class="text-end">{{ product.reorder_level|int }}</td>
+                        <td>
+                            {% if product.is_active %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle"></i>
+                                Active
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('products.view_product', product_id=product._id) }}" 
+                                   class="btn btn-outline-primary" title="View">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ url_for('products.edit_product', product_id=product._id) }}"
+                                    class="btn btn-outline-secondary" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-inbox"></i>
+            <h3>No Products Found</h3>
+            <p>Start by creating your first product</p>
+            <a href="{{ url_for('products.create_product') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i>
+                Create Product
             </a>
-        </td>
-        <td>{{ product.category_name or '-' }}</td>
-        <td>{{ product.unit }}</td>
-        <td>
-            <span class="{% if product.total_stock < product.reorder_level %}text-danger fw-bold{% endif %}">
-                {{ product.total_stock|number_format(0) }}
-            </span>
-        </td>
-        <td>{{ product.reorder_level|number_format(0) }}</td>
-        <td>
-            {% if product.is_active %}
-            <span class="badge bg-success">Active</span>
-            {% else %}
-            <span class="badge bg-secondary">Inactive</span>
-            {% endif %}
-        </td>
-        <td class="table-actions">
-            <div class="btn-group btn-group-sm">
-                <a href="{{ url_for('products.view_product', product_id=product._id) }}" class="btn btn-outline-primary"
-                    title="View">
-                    <i class="bi bi-eye"></i>
-                </a>
-                <a href="{{ url_for('products.edit_product', product_id=product._id) }}"
-                    class="btn btn-outline-secondary" title="Edit">
-                    <i class="bi bi-pencil"></i>
-                </a>
-                <button type="button" class="btn btn-outline-danger" data-confirm-delete title="Delete">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </div>
-        </td>
-    </tr>
-    {% endfor %}
-    {% endcall %}
-
-    {{ render_pagination(pagination) }}
+        </div>
+        {% endif %}
+    </div>
 </div>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: start;
-        margin-bottom: 1.5rem;
-    }
-
-    .page-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: #0f172a;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .page-description {
-        color: #64748b;
-        margin: 0.5rem 0 0;
-    }
-
-    .page-actions {
-        display: flex;
-        gap: 0.75rem;
-    }
-</style>
 {% endblock %}
