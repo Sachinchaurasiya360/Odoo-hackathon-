@@ -287,3 +287,27 @@ class ReceiptService:
             new_number = 1
 
         return f"{prefix}-{new_number:04d}"
+
+    def get_status_counts(self, warehouse_id=None):
+        """
+        Get counts of receipts by status.
+
+        Args:
+            warehouse_id (str or ObjectId, optional): Filter by warehouse.
+
+        Returns:
+            dict: Map of status to count.
+        """
+        match = {}
+        if warehouse_id:
+            if isinstance(warehouse_id, str):
+                warehouse_id = ObjectId(warehouse_id)
+            match['warehouse_id'] = warehouse_id
+
+        pipeline = [
+            {'$match': match},
+            {'$group': {'_id': '$status', 'count': {'$sum': 1}}}
+        ]
+
+        counts = list(self.db.receipts.aggregate(pipeline))
+        return {item['_id']: item['count'] for item in counts}

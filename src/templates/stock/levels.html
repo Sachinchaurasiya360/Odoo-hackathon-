@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% from "components/table.html" import render_table, render_pagination %}
+
+{% block title %}Stock Levels - Inventory Management{% endblock %}
+
+{% block breadcrumb %}
+<span class="breadcrumb-item">Inventory</span>
+<i class="bi bi-chevron-right"></i>
+<span class="breadcrumb-item">Stock Levels</span>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-content">
+        <h1 class="page-title">
+            <i class="bi bi-layers"></i>
+            Stock Levels
+        </h1>
+        <p class="page-description">Current inventory levels across all warehouses</p>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label for="product" class="form-label">Product</label>
+                <select class="form-select" id="product" name="product_id">
+                    <option value="">All Products</option>
+                    {% for product in products %}
+                    <option value="{{ product._id }}" {% if request.args.get('product_id')==product._id|string
+                        %}selected{% endif %}>
+                        {{ product.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="warehouse" class="form-label">Warehouse</label>
+                <select class="form-select" id="warehouse" name="warehouse_id">
+                    <option value="">All Warehouses</option>
+                    {% for warehouse in warehouses %}
+                    <option value="{{ warehouse._id }}" {% if request.args.get('warehouse_id')==warehouse._id|string
+                        %}selected{% endif %}>
+                        {{ warehouse.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-secondary me-2">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+                <a href="{{ url_for('stock.view_stock_levels') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-lg"></i> Clear
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Stock Levels Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Current Stock</h5>
+    </div>
+    {% call render_table(['Product', 'SKU', 'Warehouse', 'On Hand', 'Reserved', 'Available', 'Last Updated'],
+    stock_levels, actions=False) %}
+    {% for level in stock_levels %}
+    <tr>
+        <td>
+            <div class="fw-semibold">{{ level.product.name }}</div>
+        </td>
+        <td>{{ level.product.sku }}</td>
+        <td>{{ level.warehouse.name }}</td>
+        <td class="fw-bold">{{ level.quantity|number_format }}</td>
+        <td class="text-warning">{{ level.reserved_quantity|number_format }}</td>
+        <td class="text-success fw-bold">
+            {{ (level.quantity - level.reserved_quantity)|number_format }}
+        </td>
+        <td>{{ level.last_updated|datetime_format }}</td>
+    </tr>
+    {% endfor %}
+    {% endcall %}
+
+    {{ render_pagination(pagination) }}
+</div>
+{% endblock %}

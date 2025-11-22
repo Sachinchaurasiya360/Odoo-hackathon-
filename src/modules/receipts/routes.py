@@ -32,13 +32,16 @@ def list_receipts():
             page=page,
             per_page=20
         )
+        
+        status_counts = receipt_service.get_status_counts(warehouse_id)
 
         return render_template(
             'receipts/list.html',
             receipts=result['receipts'],
             pagination=result,
             current_warehouse=warehouse_id,
-            current_status=status
+            current_status=status,
+            status_counts=status_counts
         )
 
     except Exception as e:
