@@ -1,0 +1,104 @@
+<!-- Reusable Table Component -->
+{% macro render_table(headers, rows, actions=True, selectable=False) %}
+<div class="table-container">
+    <div class="table-responsive">
+        <table class="data-table" role="table">
+            <thead>
+                <tr>
+                    {% if selectable %}
+                    <th scope="col" class="table-checkbox">
+                        <input type="checkbox" class="form-check-input" id="selectAll" aria-label="Select all rows">
+                    </th>
+                    {% endif %}
+                    {% for header in headers %}
+                    <th scope="col">{{ header }}</th>
+                    {% endfor %}
+                    {% if actions %}
+                    <th scope="col" class="table-actions">Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% if rows %}
+                {{ caller() }}
+                {% else %}
+                <tr>
+                    <td colspan="{{ headers|length + (1 if actions else 0) + (1 if selectable else 0) }}"
+                        class="text-center text-muted py-5">
+                        <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                        <p class="mt-2">No data available</p>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endmacro %}
+
+<!-- Pagination Component -->
+{% macro render_pagination(pagination) %}
+{% if pagination and pagination.total_pages > 1 %}
+<nav aria-label="Table pagination" class="pagination-container">
+    <ul class="pagination">
+        <!-- Previous -->
+        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+            <a class="page-link" href="?page={{ pagination.page - 1 }}" aria-label="Previous" {% if not
+                pagination.has_prev %}tabindex="-1" aria-disabled="true" {% endif %}>
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        </li>
+
+        <!-- Page Numbers -->
+        {% set start_page = [1, pagination.page - 2]|max %}
+        {% set end_page = [pagination.total_pages, pagination.page + 2]|min %}
+
+        {% if start_page > 1 %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1">1</a>
+        </li>
+        {% if start_page > 2 %}
+        <li class="page-item disabled">
+            <span class="page-link">...</span>
+        </li>
+        {% endif %}
+        {% endif %}
+
+        {% for page_num in range(start_page, end_page + 1) %}
+        <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+            <a class="page-link" href="?page={{ page_num }}">
+                {{ page_num }}
+                {% if page_num == pagination.page %}
+                <span class="visually-hidden">(current)</span>
+                {% endif %}
+            </a>
+        </li>
+        {% endfor %}
+
+        {% if end_page < pagination.total_pages %} {% if end_page < pagination.total_pages - 1 %} <li
+            class="page-item disabled">
+            <span class="page-link">...</span>
+            </li>
+            {% endif %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ pagination.total_pages }}">{{ pagination.total_pages }}</a>
+            </li>
+            {% endif %}
+
+            <!-- Next -->
+            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                <a class="page-link" href="?page={{ pagination.page + 1 }}" aria-label="Next" {% if not
+                    pagination.has_next %}tabindex="-1" aria-disabled="true" {% endif %}>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+    </ul>
+
+    <div class="pagination-info">
+        Showing {{ ((pagination.page - 1) * pagination.per_page) + 1 }}
+        to {{ [pagination.page * pagination.per_page, pagination.total]|min }}
+        of {{ pagination.total }} entries
+    </div>
+</nav>
+{% endif %}
+{% endmacro %}
