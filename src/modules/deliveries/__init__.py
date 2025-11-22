@@ -1,1 +1,0 @@
-"""Deliveries module initialization."""
